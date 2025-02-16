@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import * as pdfjs from 'pdfjs-dist';
 
@@ -11,7 +10,9 @@ interface EvaluationResult {
 
 // Set up PDF.js worker with absolute HTTPS URL
 if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  const workerUrl = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  console.log('Setting up PDF.js worker at:', workerUrl);
+  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
 }
 
 export const evaluateAssignment = async (
@@ -126,70 +127,84 @@ const readTextContent = (file: File): Promise<string> => {
 
 const readPDFContent = async (file: File): Promise<string> => {
   try {
-    console.log('Reading PDF file:', file.name);
-    const fileReader = new FileReader();
+    console.log('Starting PDF processing for:', file.name);
 
-    const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
-      fileReader.onload = () => resolve(fileReader.result as ArrayBuffer);
-      fileReader.onerror = () => reject(fileReader.error);
-      fileReader.readAsArrayBuffer(file);
-    });
+    // Load file as ArrayBuffer
+    const arrayBuffer = await file.arrayBuffer();
+    console.log('File loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
 
-    console.log('PDF file loaded into ArrayBuffer');
-    const typedArray = new Uint8Array(arrayBuffer);
-
-    // Make sure the worker is properly initialized
-    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-      console.error('PDF.js worker not initialized');
-      throw new Error('PDF.js worker not properly initialized');
-    }
-
+    // Load the PDF document
     console.log('Loading PDF document...');
-    const loadingTask = pdfjs.getDocument({
-      data: typedArray,
-      verbosity: 1  // Increase verbosity for debugging
-    });
+    const pdf = await pdfjs.getDocument(new Uint8Array(arrayBuffer)).promise;
+    console.log('PDF loaded, pages:', pdf.numPages);
 
-    console.log('Awaiting PDF document...');
-    const pdf = await loadingTask.promise;
-    console.log(`PDF loaded successfully. Number of pages: ${pdf.numPages}`);
-
-    let fullText = '';
+    let allContent: string[] = [];
 
     // Process each page
-    for (let i = 1; i <= pdf.numPages; i++) {
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       try {
-        console.log(`Processing page ${i} of ${pdf.numPages}`);
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        
-        const pageText = textContent.items
-          .filter((item: any) => item && (typeof item.str === 'string' || typeof item.str === 'number'))
-          .map((item: any) => String(item.str).trim())
-          .join(' ');
+        console.log(`Processing page ${pageNum}/${pdf.numPages}`);
+        const page = await pdf.getPage(pageNum);
 
-        if (pageText.trim()) {
-          fullText += pageText + '\n';
+        // Get text content
+        const textContent = await page.getTextContent();
+        const textItems = textContent.items.map((item: any) => 
+          typeof item.str === 'string' ? item.str.trim() : ''
+        ).filter(Boolean);
+
+        // Get annotations (might contain additional text)
+        const annotations = await page.getAnnotations();
+        const annotationText = annotations
+          .map(annot => annot.contents || '')
+          .filter(Boolean);
+
+        // Extract any embedded text from figures/images
+        const operatorList = await page.getOperatorList();
+        const imgItems = operatorList.fnArray
+          .map((fn: any, index: number) => {
+            if (fn === pdfjs.OPS.paintImageXObject) {
+              const imgData = operatorList.argsArray[index][0];
+              return `[Image: ${imgData}]`; // Mark image presence in text
+            }
+            return '';
+          })
+          .filter(Boolean);
+
+        // Combine all content from this page
+        const pageContent = [
+          ...textItems,
+          ...annotationText,
+          ...imgItems
+        ].join(' ');
+
+        if (pageContent.trim()) {
+          allContent.push(pageContent);
+          console.log(`Page ${pageNum} content length:`, pageContent.length);
         }
-        
-        console.log(`Page ${i} processed successfully`);
+
       } catch (pageError) {
-        console.error(`Error processing page ${i}:`, pageError);
-        // Continue with other pages even if one fails
+        console.error(`Error on page ${pageNum}:`, pageError);
+        // Continue with other pages
       }
     }
 
-    console.log('PDF text extraction complete');
-    fullText = fullText.trim();
+    const finalContent = allContent.join('\n\n').trim();
+    console.log('Total extracted content length:', finalContent.length);
 
-    if (!fullText) {
-      throw new Error('No text content could be extracted from the PDF');
+    if (!finalContent) {
+      throw new Error('No content could be extracted from PDF');
     }
 
-    return fullText;
+    // Clean up the content
+    const cleanedContent = finalContent
+      .replace(/\s+/g, ' ')  // Normalize whitespace
+      .replace(/\[Image:[^\]]+\]/g, ' ') // Clean up image markers
+      .trim();
+
+    return cleanedContent;
   } catch (error) {
-    console.error('PDF processing error:', error);
-    throw new Error(`Failed to process PDF: ${error.message}`);
+    console.error('PDF processing failed:', error);
+    throw new Error(`PDF processing failed: ${error.message}`);
   }
 };
 

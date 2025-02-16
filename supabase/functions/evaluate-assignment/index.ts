@@ -29,9 +29,16 @@ serve(async (req) => {
   try {
     const { assignmentText, instructionsText } = await req.json()
 
-    // Sanitize input texts
-    const sanitizedAssignmentText = sanitizeText(assignmentText || '')
-    const sanitizedInstructionsText = instructionsText ? sanitizeText(instructionsText) : ''
+    // Validate input
+    if (!assignmentText || assignmentText.trim().length === 0) {
+      throw new Error('No assignment text provided');
+    }
+
+    // Sanitize and truncate input texts to prevent timeouts
+    const maxLength = 10000; // Limit text length to prevent timeouts
+    const sanitizedAssignmentText = sanitizeText(assignmentText).slice(0, maxLength);
+    const sanitizedInstructionsText = instructionsText ? 
+      sanitizeText(instructionsText).slice(0, maxLength) : '';
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -75,6 +82,7 @@ serve(async (req) => {
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
+        max_tokens: 1000, // Limit response length
       }),
     })
 
@@ -96,28 +104,26 @@ serve(async (req) => {
 
     try {
       const evaluation = JSON.parse(evaluationContent)
+      
+      // Store the evaluation in background
+      EdgeRuntime.waitUntil((async () => {
+        try {
+          const sanitizedEvaluation = {
+            assignment_text: sanitizedAssignmentText,
+            instructions_text: sanitizedInstructionsText,
+            grade: sanitizeText(evaluation.grade),
+            reasoning: sanitizeText(evaluation.reasoning),
+            improvements: evaluation.improvements.map(sanitizeText),
+            strengths: evaluation.strengths.map(sanitizeText)
+          }
 
-      // Sanitize the evaluation content before storing
-      const sanitizedEvaluation = {
-        assignment_text: sanitizedAssignmentText,
-        instructions_text: sanitizedInstructionsText,
-        grade: sanitizeText(evaluation.grade),
-        reasoning: sanitizeText(evaluation.reasoning),
-        improvements: evaluation.improvements.map(sanitizeText),
-        strengths: evaluation.strengths.map(sanitizeText)
-      }
-
-      // Store the evaluation in the database
-      const { data: storedEvaluation, error: dbError } = await supabase
-        .from('evaluations')
-        .insert(sanitizedEvaluation)
-        .select()
-        .single()
-
-      if (dbError) {
-        console.error('Database Error:', dbError)
-        throw new Error('Failed to store evaluation')
-      }
+          await supabase
+            .from('evaluations')
+            .insert(sanitizedEvaluation)
+        } catch (dbError) {
+          console.error('Database Error:', dbError)
+        }
+      })())
 
       return new Response(
         JSON.stringify(evaluation),

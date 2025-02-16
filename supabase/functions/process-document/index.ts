@@ -14,29 +14,35 @@ serve(async (req) => {
   }
 
   try {
-    const { fileContent } = await req.json()
+    const { fileContent, fileName } = await req.json()
+    console.log('Processing document:', fileName);
     
-    // Convert array back to Uint8Array
-    const buffer = new Uint8Array(fileContent)
+    // Convert base64 back to Uint8Array
+    const binaryString = atob(fileContent);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    console.log('Document size:', bytes.length, 'bytes');
 
     // Process Word document
-    const result = await mammoth.extractRawText({ arrayBuffer: buffer.buffer })
-    const text = result.value
+    const result = await mammoth.extractRawText({ arrayBuffer: bytes.buffer });
+    
+    if (!result.value) {
+      throw new Error('No text content extracted from document');
+    }
 
-    // Also extract any images or equations (base64 encoded)
-    const images = await mammoth.images.embedImage({
-      arrayBuffer: buffer.buffer,
-      contentType: "image/*"
-    })
+    const text = result.value.trim();
+    console.log('Extracted text length:', text.length);
+
+    // Log any warnings
+    if (result.messages.length > 0) {
+      console.log('Document processing messages:', result.messages);
+    }
 
     return new Response(
-      JSON.stringify({ 
-        text,
-        images: images.map(img => ({
-          contentType: img.contentType,
-          data: img.data.toString('base64')
-        }))
-      }),
+      JSON.stringify({ text }),
       { 
         headers: { 
           ...corsHeaders,
@@ -45,9 +51,12 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error processing document:', error)
+    console.error('Error processing document:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: 'Failed to process document'
+      }),
       { 
         status: 500,
         headers: { 

@@ -1,3 +1,4 @@
+
 import { Upload, AlertCircle, Star, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -53,9 +54,50 @@ const Index = () => {
           </motion.div>
         </section>
 
-        <div className="max-w-4xl mx-auto mb-16">
+        <div className="max-w-7xl mx-auto mb-16">
           <Card className="p-6">
-            <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Instructions Section */}
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Upload opgavebeskrivelsen</label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <input
+                      type="file"
+                      accept=".doc,.docx,.pdf"
+                      onChange={handleInstructionsFileChange}
+                      className="hidden"
+                      id="instructions-upload"
+                    />
+                    <label
+                      htmlFor="instructions-upload"
+                      className="cursor-pointer flex flex-col items-center"
+                    >
+                      <FileText className="w-12 h-12 text-primary mb-2" />
+                      <span className="text-sm text-gray-600">
+                        Klik for at uploade eller træk filen hertil (.doc, .docx, .pdf)
+                      </span>
+                      {instructionsFile && (
+                        <span className="mt-2 text-sm text-primary">{instructionsFile.name}</span>
+                      )}
+                    </label>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Eller indsæt opgavebeskrivelsen direkte
+                  </label>
+                  <Textarea
+                    placeholder="Indsæt opgavebeskrivelsen her..."
+                    value={instructionsText}
+                    onChange={(e) => setInstructionsText(e.target.value)}
+                    className="min-h-[400px]"
+                  />
+                </div>
+              </div>
+
+              {/* Assignment Section */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-gray-900">Din Opgave</h3>
                 <div className="space-y-2">
@@ -90,61 +132,22 @@ const Index = () => {
                     placeholder="Indsæt din opgavetekst her..."
                     value={assignmentText}
                     onChange={(e) => setAssignmentText(e.target.value)}
-                    className="min-h-[200px]"
+                    className="min-h-[400px]"
                   />
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-4 pt-6 border-t border-gray-200">
-                <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Upload opgavebeskrivelsen</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <input
-                      type="file"
-                      accept=".doc,.docx,.pdf"
-                      onChange={handleInstructionsFileChange}
-                      className="hidden"
-                      id="instructions-upload"
-                    />
-                    <label
-                      htmlFor="instructions-upload"
-                      className="cursor-pointer flex flex-col items-center"
-                    >
-                      <FileText className="w-12 h-12 text-primary mb-2" />
-                      <span className="text-sm text-gray-600">
-                        Klik for at uploade eller træk filen hertil (.doc, .docx, .pdf)
-                      </span>
-                      {instructionsFile && (
-                        <span className="mt-2 text-sm text-primary">{instructionsFile.name}</span>
-                      )}
-                    </label>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
-                    Eller indsæt opgavebeskrivelsen direkte
-                  </label>
-                  <Textarea
-                    placeholder="Indsæt opgavebeskrivelsen her..."
-                    value={instructionsText}
-                    onChange={(e) => setInstructionsText(e.target.value)}
-                    className="min-h-[200px]"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-6 text-center pt-6 border-t border-gray-200">
-                <Button
-                  size="lg"
-                  className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Upload className="mr-2 h-5 w-5" /> Bedøm opgave
-                </Button>
-                <p className="mt-4 text-sm text-gray-500">
-                  * Login påkrævet for at se din karaktervurdering
-                </p>
-              </div>
+            <div className="mt-8 text-center pt-6 border-t border-gray-200">
+              <Button
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
+              >
+                <Upload className="mr-2 h-5 w-5" /> Bedøm opgave
+              </Button>
+              <p className="mt-4 text-sm text-gray-500">
+                * Login påkrævet for at se din karaktervurdering
+              </p>
             </div>
           </Card>
         </div>

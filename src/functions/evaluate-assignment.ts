@@ -9,9 +9,9 @@ interface EvaluationResult {
   strengths: string[];
 }
 
-// Set up PDF.js worker
+// Set up PDF.js worker with absolute HTTPS URL
 if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 }
 
 export const evaluateAssignment = async (
@@ -28,19 +28,27 @@ export const evaluateAssignment = async (
     if (assignmentFile) {
       console.log('Processing assignment file:', assignmentFile.name, assignmentFile.type);
       assignmentContent = await readFileContent(assignmentFile);
+      console.log('Successfully processed assignment file, content length:', assignmentContent.length);
     }
 
     if (instructionsFile) {
       console.log('Processing instructions file:', instructionsFile.name, instructionsFile.type);
       instructionsContent = await readFileContent(instructionsFile);
+      console.log('Successfully processed instructions file, content length:', instructionsContent.length);
     }
 
-    console.log('Assignment content length:', assignmentContent.length);
-    console.log('Instructions content length:', instructionsContent.length);
+    // Validate content before sending to API
+    if (!assignmentContent.trim()) {
+      throw new Error('No content found in assignment');
+    }
 
-    // Clean the content before sending to the API
+    // Clean and truncate content if needed
     assignmentContent = cleanContent(assignmentContent);
     instructionsContent = cleanContent(instructionsContent);
+
+    // Log content sizes before sending
+    console.log('Final assignment content length:', assignmentContent.length);
+    console.log('Final instructions content length:', instructionsContent.length);
 
     const { data, error } = await supabase.functions.invoke('evaluate-assignment', {
       body: {
@@ -51,7 +59,11 @@ export const evaluateAssignment = async (
 
     if (error) {
       console.error('Evaluation Error:', error);
-      throw new Error('Failed to evaluate assignment');
+      throw new Error(`Failed to evaluate assignment: ${error.message}`);
+    }
+
+    if (!data) {
+      throw new Error('No evaluation data received');
     }
 
     return data;
@@ -62,11 +74,19 @@ export const evaluateAssignment = async (
 };
 
 const cleanContent = (text: string): string => {
-  return text
+  let cleaned = text
     .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
     .replace(/^\uFEFF/, '') // Remove BOM
     .replace(/\u0000/g, '') // Remove null bytes
+    .replace(/[\uFFFD\uFFFE\uFFFF]/g, '') // Remove Unicode replacement characters
     .trim();
+
+  // Ensure we have valid content after cleaning
+  if (!cleaned) {
+    throw new Error('Content is empty after cleaning');
+  }
+
+  return cleaned;
 };
 
 const readFileContent = async (file: File): Promise<string> => {
@@ -82,7 +102,6 @@ const readFileContent = async (file: File): Promise<string> => {
       return await readWordContent(file);
     }
     
-    // Default to text content for unknown types
     return await readTextContent(file);
   } catch (error) {
     console.error('Error reading file:', file.name, error);
@@ -108,12 +127,22 @@ const readTextContent = (file: File): Promise<string> => {
 const readPDFContent = async (file: File): Promise<string> => {
   try {
     console.log('Reading PDF file:', file.name);
+
+    // First, ensure the PDF worker is properly loaded
+    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+      throw new Error('PDF.js worker not properly initialized');
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const typedArray = new Uint8Array(arrayBuffer);
     
-    // Initialize PDF.js with the typed array
     console.log('Initializing PDF.js...');
-    const loadingTask = pdfjs.getDocument({ data: typedArray });
+    const loadingTask = pdfjs.getDocument({
+      data: typedArray,
+      verbosity: 0  // Reduce console noise
+    });
+
+    console.log('Waiting for PDF to load...');
     const pdf = await loadingTask.promise;
     console.log('PDF loaded successfully, pages:', pdf.numPages);
     
@@ -126,31 +155,25 @@ const readPDFContent = async (file: File): Promise<string> => {
       const textContent = await page.getTextContent();
       const pageText = textContent.items
         .map((item: any) => {
-          // Handle different types of PDF text content
-          if (typeof item.str === 'string') {
-            return item.str;
-          }
-          // Handle potential numeric or other types
+          if (!item) return '';
+          if (typeof item.str === 'string') return item.str;
           return String(item.str || '');
         })
         .join(' ');
-      fullText += pageText + '\n';
+      
+      if (pageText.trim()) {
+        fullText += pageText + '\n';
+      }
     }
     
     console.log('PDF content extracted, length:', fullText.length);
     
-    // Clean up any leftover control characters or invalid Unicode
-    fullText = fullText
-      .replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
-      .replace(/\u0000/g, '') // Remove null bytes
-      .replace(/[\uFFFD\uFFFE\uFFFF]/g, '') // Remove Unicode replacement characters
-      .trim();
-    
-    if (!fullText) {
-      throw new Error('No text content extracted from PDF');
+    // Validate extracted content
+    if (!fullText.trim()) {
+      throw new Error('No text content could be extracted from the PDF');
     }
     
-    return fullText;
+    return fullText.trim();
   } catch (error) {
     console.error('PDF processing error:', error);
     throw new Error(`Failed to process PDF: ${error.message}`);
@@ -178,6 +201,10 @@ const readWordContent = async (file: File): Promise<string> => {
     if (error) {
       console.error('Word processing error:', error);
       throw new Error('Failed to process Word document');
+    }
+
+    if (!data?.text) {
+      throw new Error('No text content received from document processor');
     }
 
     console.log('Word content processed successfully');

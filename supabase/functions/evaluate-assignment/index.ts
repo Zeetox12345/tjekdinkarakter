@@ -33,11 +33,13 @@ serve(async (req) => {
       
       Opgave:\n${assignmentText}
       
-      Giv venligst:
-      1. En karakter på 7-trinsskalaen
-      2. En detaljeret begrundelse for karakteren
-      3. Konkrete forbedringsforslag
-      4. Specifikke styrker ved opgaven
+      VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
+      {
+        "grade": "karakteren her",
+        "reasoning": "begrundelse her",
+        "improvements": ["forbedring 1", "forbedring 2"],
+        "strengths": ["styrke 1", "styrke 2"]
+      }
     `
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -51,7 +53,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer altid i det specificerede JSON format med følgende felter: grade, reasoning, improvements (array), strengths (array).' 
+            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],
@@ -66,36 +68,50 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    const evaluation = JSON.parse(data.choices[0].message.content)
-
-    // Store the evaluation in the database
-    const { data: storedEvaluation, error: dbError } = await supabase
-      .from('evaluations')
-      .insert({
-        assignment_text: assignmentText,
-        instructions_text: instructionsText,
-        grade: evaluation.grade,
-        reasoning: evaluation.reasoning,
-        improvements: evaluation.improvements,
-        strengths: evaluation.strengths
-      })
-      .select()
-      .single()
-
-    if (dbError) {
-      console.error('Database Error:', dbError)
-      throw new Error('Failed to store evaluation')
+    let evaluationContent = data.choices[0].message.content.trim()
+    
+    // Remove any potential markdown formatting or code blocks
+    if (evaluationContent.startsWith('```json')) {
+      evaluationContent = evaluationContent.replace(/```json\n/, '').replace(/\n```$/, '')
+    } else if (evaluationContent.startsWith('```')) {
+      evaluationContent = evaluationContent.replace(/```\n/, '').replace(/\n```$/, '')
     }
 
-    return new Response(
-      JSON.stringify(evaluation),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
+    try {
+      const evaluation = JSON.parse(evaluationContent)
+
+      // Store the evaluation in the database
+      const { data: storedEvaluation, error: dbError } = await supabase
+        .from('evaluations')
+        .insert({
+          assignment_text: assignmentText,
+          instructions_text: instructionsText,
+          grade: evaluation.grade,
+          reasoning: evaluation.reasoning,
+          improvements: evaluation.improvements,
+          strengths: evaluation.strengths
+        })
+        .select()
+        .single()
+
+      if (dbError) {
+        console.error('Database Error:', dbError)
+        throw new Error('Failed to store evaluation')
       }
-    )
+
+      return new Response(
+        JSON.stringify(evaluation),
+        { 
+          headers: { 
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          } 
+        }
+      )
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError, 'Content:', evaluationContent)
+      throw new Error('Failed to parse evaluation response')
+    }
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error)
     return new Response(

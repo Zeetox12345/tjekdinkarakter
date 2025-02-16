@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import * as pdfjs from 'pdfjs-dist';
 
@@ -110,21 +111,6 @@ const readFileContent = async (file: File): Promise<string> => {
   }
 };
 
-const readTextContent = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (event.target?.result) {
-        resolve(event.target.result as string);
-      } else {
-        reject(new Error('Failed to read file'));
-      }
-    };
-    reader.onerror = () => reject(new Error(`FileReader error: ${reader.error?.message || 'Unknown error'}`));
-    reader.readAsText(file);
-  });
-};
-
 const readPDFContent = async (file: File): Promise<string> => {
   try {
     console.log('Starting PDF processing for:', file.name);
@@ -135,7 +121,7 @@ const readPDFContent = async (file: File): Promise<string> => {
 
     // Load the PDF document
     console.log('Loading PDF document...');
-    const pdf = await pdfjs.getDocument(new Uint8Array(arrayBuffer)).promise;
+    const pdf = await pdfjs.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     console.log('PDF loaded, pages:', pdf.numPages);
 
     let allContent: string[] = [];
@@ -145,46 +131,20 @@ const readPDFContent = async (file: File): Promise<string> => {
       try {
         console.log(`Processing page ${pageNum}/${pdf.numPages}`);
         const page = await pdf.getPage(pageNum);
-
-        // Get text content
         const textContent = await page.getTextContent();
-        const textItems = textContent.items.map((item: any) => 
-          typeof item.str === 'string' ? item.str.trim() : ''
-        ).filter(Boolean);
+        
+        const pageText = textContent.items
+          .map((item: any) => item.str || '')
+          .join(' ')
+          .trim();
 
-        // Get annotations (might contain additional text)
-        const annotations = await page.getAnnotations();
-        const annotationText = annotations
-          .map(annot => annot.contents || '')
-          .filter(Boolean);
-
-        // Extract any embedded text from figures/images
-        const operatorList = await page.getOperatorList();
-        const imgItems = operatorList.fnArray
-          .map((fn: any, index: number) => {
-            if (fn === pdfjs.OPS.paintImageXObject) {
-              const imgData = operatorList.argsArray[index][0];
-              return `[Image: ${imgData}]`; // Mark image presence in text
-            }
-            return '';
-          })
-          .filter(Boolean);
-
-        // Combine all content from this page
-        const pageContent = [
-          ...textItems,
-          ...annotationText,
-          ...imgItems
-        ].join(' ');
-
-        if (pageContent.trim()) {
-          allContent.push(pageContent);
-          console.log(`Page ${pageNum} content length:`, pageContent.length);
+        if (pageText) {
+          allContent.push(pageText);
+          console.log(`Page ${pageNum} content length:`, pageText.length);
         }
 
       } catch (pageError) {
         console.error(`Error on page ${pageNum}:`, pageError);
-        // Continue with other pages
       }
     }
 
@@ -195,13 +155,7 @@ const readPDFContent = async (file: File): Promise<string> => {
       throw new Error('No content could be extracted from PDF');
     }
 
-    // Clean up the content
-    const cleanedContent = finalContent
-      .replace(/\s+/g, ' ')  // Normalize whitespace
-      .replace(/\[Image:[^\]]+\]/g, ' ') // Clean up image markers
-      .trim();
-
-    return cleanedContent;
+    return finalContent;
   } catch (error) {
     console.error('PDF processing failed:', error);
     throw new Error(`PDF processing failed: ${error.message}`);
@@ -212,12 +166,18 @@ const readWordContent = async (file: File): Promise<string> => {
   try {
     console.log('Reading Word file:', file.name);
     const arrayBuffer = await file.arrayBuffer();
+    
+    // Create Uint8Array from ArrayBuffer
     const uint8Array = new Uint8Array(arrayBuffer);
     
-    // Convert to base64 to avoid binary data issues
-    const base64Content = btoa(String.fromCharCode.apply(null, uint8Array));
+    // Convert to base64
+    let binary = '';
+    uint8Array.forEach(byte => {
+      binary += String.fromCharCode(byte);
+    });
+    const base64Content = btoa(binary);
     
-    console.log('Word file size:', uint8Array.length, 'bytes');
+    console.log('Word file processed, sending to API...');
     
     const { data, error } = await supabase.functions.invoke('process-document', {
       body: { 
@@ -235,10 +195,25 @@ const readWordContent = async (file: File): Promise<string> => {
       throw new Error('No text content received from document processor');
     }
 
-    console.log('Word content processed successfully');
+    console.log('Word content processed successfully, length:', data.text.length);
     return data.text;
   } catch (error) {
     console.error('Word processing error:', error);
     throw new Error(`Failed to process Word document: ${error.message}`);
   }
+};
+
+const readTextContent = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        resolve(event.target.result as string);
+      } else {
+        reject(new Error('Failed to read file'));
+      }
+    };
+    reader.onerror = () => reject(new Error(`FileReader error: ${reader.error?.message || 'Unknown error'}`));
+    reader.readAsText(file);
+  });
 };

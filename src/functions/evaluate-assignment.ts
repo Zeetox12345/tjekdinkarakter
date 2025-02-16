@@ -1,39 +1,30 @@
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { Document } from "https://deno.land/x/doc_reader@v0.1.0/mod.ts";
+import { FormData } from '@supabase/supabase-js';
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+interface EvaluationResult {
+  grade: string;
+  reasoning: string;
+  improvements: string[];
+  strengths: string[];
+}
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+export const evaluateAssignment = async (
+  assignmentFile: File | null,
+  assignmentText: string,
+  instructionsFile: File | null,
+  instructionsText: string
+): Promise<EvaluationResult> => {
   try {
-    const formData = await req.formData();
-    const assignmentFile = formData.get('assignmentFile') as File;
-    const assignmentText = formData.get('assignmentText') as string;
-    const instructionsFile = formData.get('instructionsFile') as File;
-    const instructionsText = formData.get('instructionsText') as string;
-
     let assignmentContent = assignmentText || '';
     let instructionsContent = instructionsText || '';
 
     // Handle file content if files are provided
     if (assignmentFile) {
-      const doc = new Document(await assignmentFile.arrayBuffer());
-      assignmentContent = await doc.getText();
+      assignmentContent = await readFileContent(assignmentFile);
     }
 
     if (instructionsFile) {
-      const doc = new Document(await instructionsFile.arrayBuffer());
-      instructionsContent = await doc.getText();
+      instructionsContent = await readFileContent(instructionsFile);
     }
 
     const prompt = `
@@ -48,20 +39,12 @@ serve(async (req) => {
       2. En detaljeret begrundelse for karakteren
       3. Konkrete forbedringsforslag
       4. Specifikke styrker ved opgaven
-      
-      Format svaret som JSON med følgende struktur:
-      {
-        "grade": "karakter",
-        "reasoning": "begrundelse",
-        "improvements": ["forbedringsforslag1", "forbedringsforslag2", ...],
-        "strengths": ["styrke1", "styrke2", ...]
-      }
     `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${process.env.VITE_OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -74,17 +57,42 @@ serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
-    const evaluation = JSON.parse(data.choices[0].message.content);
+    if (!response.ok) {
+      throw new Error('Failed to evaluate assignment');
+    }
 
-    return new Response(JSON.stringify(evaluation), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    const data = await response.json();
+    return JSON.parse(data.choices[0].message.content);
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    throw error;
   }
-});
+};
+
+const readFileContent = async (file: File): Promise<string> => {
+  if (file.type === 'application/pdf') {
+    return await readPDFContent(file);
+  }
+  return await readTextContent(file);
+};
+
+const readTextContent = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        resolve(event.target.result as string);
+      } else {
+        reject(new Error('Failed to read file'));
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+};
+
+const readPDFContent = async (file: File): Promise<string> => {
+  // For now, return a simple text reading. We can enhance this later with PDF.js
+  return await readTextContent(file);
+};
+

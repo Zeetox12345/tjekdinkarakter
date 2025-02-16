@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import EvaluationResult from "@/components/EvaluationResult";
 import { Progress } from "@/components/ui/progress";
+import { evaluateAssignment } from "@/functions/evaluate-assignment";
 
 const Index = () => {
   const [assignmentText, setAssignmentText] = useState("");
@@ -43,7 +44,6 @@ const Index = () => {
     setIsLoading(true);
     setProgress(0);
     
-    // Simulate progress
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) {
@@ -55,20 +55,13 @@ const Index = () => {
     }, 1000);
 
     try {
-      const formData = new FormData();
-      if (assignmentFile) formData.append('assignmentFile', assignmentFile);
-      if (assignmentText) formData.append('assignmentText', assignmentText);
-      if (instructionsFile) formData.append('instructionsFile', instructionsFile);
-      if (instructionsText) formData.append('instructionsText', instructionsText);
-
-      const response = await fetch('/api/evaluate-assignment', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Evaluation failed');
-
-      const result = await response.json();
+      const result = await evaluateAssignment(
+        assignmentFile,
+        assignmentText,
+        instructionsFile,
+        instructionsText
+      );
+      
       setEvaluation(result);
       setProgress(100);
     } catch (error) {

@@ -127,53 +127,66 @@ const readTextContent = (file: File): Promise<string> => {
 const readPDFContent = async (file: File): Promise<string> => {
   try {
     console.log('Reading PDF file:', file.name);
+    const fileReader = new FileReader();
 
-    // First, ensure the PDF worker is properly loaded
+    const arrayBuffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+      fileReader.onload = () => resolve(fileReader.result as ArrayBuffer);
+      fileReader.onerror = () => reject(fileReader.error);
+      fileReader.readAsArrayBuffer(file);
+    });
+
+    console.log('PDF file loaded into ArrayBuffer');
+    const typedArray = new Uint8Array(arrayBuffer);
+
+    // Make sure the worker is properly initialized
     if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+      console.error('PDF.js worker not initialized');
       throw new Error('PDF.js worker not properly initialized');
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const typedArray = new Uint8Array(arrayBuffer);
-    
-    console.log('Initializing PDF.js...');
+    console.log('Loading PDF document...');
     const loadingTask = pdfjs.getDocument({
       data: typedArray,
-      verbosity: 0  // Reduce console noise
+      verbosity: 1  // Increase verbosity for debugging
     });
 
-    console.log('Waiting for PDF to load...');
+    console.log('Awaiting PDF document...');
     const pdf = await loadingTask.promise;
-    console.log('PDF loaded successfully, pages:', pdf.numPages);
-    
+    console.log(`PDF loaded successfully. Number of pages: ${pdf.numPages}`);
+
     let fullText = '';
-    
-    // Read text from all pages
+
+    // Process each page
     for (let i = 1; i <= pdf.numPages; i++) {
-      console.log(`Processing PDF page ${i} of ${pdf.numPages}`);
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items
-        .map((item: any) => {
-          if (!item) return '';
-          if (typeof item.str === 'string') return item.str;
-          return String(item.str || '');
-        })
-        .join(' ');
-      
-      if (pageText.trim()) {
-        fullText += pageText + '\n';
+      try {
+        console.log(`Processing page ${i} of ${pdf.numPages}`);
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        
+        const pageText = textContent.items
+          .filter((item: any) => item && (typeof item.str === 'string' || typeof item.str === 'number'))
+          .map((item: any) => String(item.str).trim())
+          .join(' ');
+
+        if (pageText.trim()) {
+          fullText += pageText + '\n';
+        }
+        
+        console.log(`Page ${i} processed successfully`);
+      } catch (pageError) {
+        console.error(`Error processing page ${i}:`, pageError);
+        // Continue with other pages even if one fails
       }
     }
-    
-    console.log('PDF content extracted, length:', fullText.length);
-    
-    // Validate extracted content
-    if (!fullText.trim()) {
+
+    console.log('PDF text extraction complete');
+    fullText = fullText.trim();
+
+    if (!fullText) {
       throw new Error('No text content could be extracted from the PDF');
     }
-    
-    return fullText.trim();
+
+    return fullText;
   } catch (error) {
     console.error('PDF processing error:', error);
     throw new Error(`Failed to process PDF: ${error.message}`);

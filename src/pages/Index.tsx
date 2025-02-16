@@ -1,16 +1,22 @@
-
 import { Upload, AlertCircle, Star, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
+import EvaluationResult from "@/components/EvaluationResult";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const [assignmentText, setAssignmentText] = useState("");
   const [instructionsText, setInstructionsText] = useState("");
   const [assignmentFile, setAssignmentFile] = useState<File | null>(null);
   const [instructionsFile, setInstructionsFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [evaluation, setEvaluation] = useState<any>(null);
+  const [progress, setProgress] = useState(0);
+  const { toast } = useToast();
 
   const handleAssignmentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -21,6 +27,59 @@ const Index = () => {
   const handleInstructionsFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setInstructionsFile(e.target.files[0]);
+    }
+  };
+
+  const handleEvaluate = async () => {
+    if (!assignmentText && !assignmentFile) {
+      toast({
+        title: "Ingen opgave at vurdere",
+        description: "Du skal enten uploade en fil eller indtaste opgavetekst",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setProgress(0);
+    
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 1000);
+
+    try {
+      const formData = new FormData();
+      if (assignmentFile) formData.append('assignmentFile', assignmentFile);
+      if (assignmentText) formData.append('assignmentText', assignmentText);
+      if (instructionsFile) formData.append('instructionsFile', instructionsFile);
+      if (instructionsText) formData.append('instructionsText', instructionsText);
+
+      const response = await fetch('/api/evaluate-assignment', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error('Evaluation failed');
+
+      const result = await response.json();
+      setEvaluation(result);
+      setProgress(100);
+    } catch (error) {
+      toast({
+        title: "Fejl ved vurdering",
+        description: "Der opstod en fejl under vurderingen af din opgave. Prøv igen senere.",
+        variant: "destructive",
+      });
+    } finally {
+      clearInterval(progressInterval);
+      setIsLoading(false);
     }
   };
 
@@ -53,6 +112,24 @@ const Index = () => {
             </p>
           </motion.div>
         </section>
+
+        {isLoading && (
+          <div className="max-w-xl mx-auto mb-8">
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Vurderer din opgave...</h3>
+              <Progress value={progress} className="mb-2" />
+              <p className="text-sm text-gray-600 text-center">
+                Dette kan tage et par minutter
+              </p>
+            </Card>
+          </div>
+        )}
+
+        {evaluation && !isLoading && (
+          <div className="max-w-4xl mx-auto mb-8">
+            <EvaluationResult evaluation={evaluation} />
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto mb-16">
           <Card className="p-6">
@@ -142,11 +219,14 @@ const Index = () => {
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
+                onClick={handleEvaluate}
+                disabled={isLoading}
               >
-                <Upload className="mr-2 h-5 w-5" /> Bedøm opgave
+                <Upload className="mr-2 h-5 w-5" />
+                {isLoading ? "Vurderer..." : "Bedøm opgave"}
               </Button>
               <p className="mt-4 text-sm text-gray-500">
-                * Login påkrævet for at se din karaktervurdering
+                * Tilføj opgavebeskrivelsen for en mere præcis vurdering
               </p>
             </div>
           </Card>

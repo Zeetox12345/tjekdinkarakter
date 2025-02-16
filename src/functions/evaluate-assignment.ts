@@ -106,9 +106,15 @@ const readPDFContent = async (file: File): Promise<string> => {
     const arrayBuffer = await file.arrayBuffer();
     const typedArray = new Uint8Array(arrayBuffer);
     
-    // Initialize PDF.js
-    const loadingTask = pdfjs.getDocument(typedArray);
+    // Set worker path for PDF.js
+    const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.entry');
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker.default;
+    
+    // Initialize PDF.js with the typed array
+    console.log('Initializing PDF.js...');
+    const loadingTask = pdfjs.getDocument({ data: typedArray });
     const pdf = await loadingTask.promise;
+    console.log('PDF loaded successfully, pages:', pdf.numPages);
     
     let fullText = '';
     
@@ -118,12 +124,31 @@ const readPDFContent = async (file: File): Promise<string> => {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
       const pageText = textContent.items
-        .map((item: any) => item.str)
+        .map((item: any) => {
+          // Handle different types of PDF text content
+          if (typeof item.str === 'string') {
+            return item.str;
+          }
+          // Handle potential numeric or other types
+          return String(item.str || '');
+        })
         .join(' ');
       fullText += pageText + '\n';
     }
     
-    console.log('PDF content length:', fullText.length);
+    console.log('PDF content extracted, length:', fullText.length);
+    
+    // Clean up any leftover control characters or invalid Unicode
+    fullText = fullText
+      .replace(/[\x00-\x09\x0B-\x0C\x0E-\x1F\x7F]/g, '') // Remove control characters
+      .replace(/\u0000/g, '') // Remove null bytes
+      .replace(/[\uFFFD\uFFFE\uFFFF]/g, '') // Remove Unicode replacement characters
+      .trim();
+    
+    if (!fullText) {
+      throw new Error('No text content extracted from PDF');
+    }
+    
     return fullText;
   } catch (error) {
     console.error('PDF processing error:', error);

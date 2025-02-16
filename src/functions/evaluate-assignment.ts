@@ -37,18 +37,31 @@ export const evaluateAssignment = async (
       2. En detaljeret begrundelse for karakteren
       3. Konkrete forbedringsforslag
       4. Specifikke styrker ved opgaven
+
+      Svar venligst i følgende JSON format:
+      {
+        "grade": "karakter her",
+        "reasoning": "begrundelse her",
+        "improvements": ["forbedringsforslag 1", "forbedringsforslag 2"],
+        "strengths": ["styrke 1", "styrke 2"]
+      }
     `;
+
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OpenAI API key is not configured');
+    }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'Du er en erfaren dansklærer der vurderer opgaver.' },
+          { role: 'system', content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer altid i det specificerede JSON format.' },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
@@ -56,11 +69,20 @@ export const evaluateAssignment = async (
     });
 
     if (!response.ok) {
-      throw new Error('Failed to evaluate assignment');
+      const errorData = await response.json();
+      console.error('OpenAI API Error:', errorData);
+      throw new Error(errorData.error?.message || 'Failed to evaluate assignment');
     }
 
     const data = await response.json();
-    return JSON.parse(data.choices[0].message.content);
+    const content = data.choices[0].message.content;
+    
+    try {
+      return JSON.parse(content);
+    } catch (parseError) {
+      console.error('Error parsing OpenAI response:', content);
+      throw new Error('Invalid response format from evaluation service');
+    }
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);
     throw error;

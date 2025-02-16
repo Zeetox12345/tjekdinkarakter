@@ -7,6 +7,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Function to sanitize text input
+const sanitizeText = (text: string): string => {
+  // Remove null bytes and other problematic characters
+  return text
+    .replace(/\0/g, '')
+    // Replace Unicode escape sequences with their actual characters
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    // Remove any non-printable characters except newlines and tabs
+    .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/g, '')
+    // Ensure the text is valid UTF-8
+    .normalize();
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -15,6 +28,10 @@ serve(async (req) => {
 
   try {
     const { assignmentText, instructionsText } = await req.json()
+
+    // Sanitize input texts
+    const sanitizedAssignmentText = sanitizeText(assignmentText || '')
+    const sanitizedInstructionsText = instructionsText ? sanitizeText(instructionsText) : ''
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -29,9 +46,9 @@ serve(async (req) => {
     const prompt = `
       Som en erfaren dansklærer, vurder venligst følgende opgave:
       
-      ${instructionsText ? `Opgavebeskrivelse:\n${instructionsText}\n\n` : ''}
+      ${sanitizedInstructionsText ? `Opgavebeskrivelse:\n${sanitizedInstructionsText}\n\n` : ''}
       
-      Opgave:\n${assignmentText}
+      Opgave:\n${sanitizedAssignmentText}
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -80,17 +97,20 @@ serve(async (req) => {
     try {
       const evaluation = JSON.parse(evaluationContent)
 
+      // Sanitize the evaluation content before storing
+      const sanitizedEvaluation = {
+        assignment_text: sanitizedAssignmentText,
+        instructions_text: sanitizedInstructionsText,
+        grade: sanitizeText(evaluation.grade),
+        reasoning: sanitizeText(evaluation.reasoning),
+        improvements: evaluation.improvements.map(sanitizeText),
+        strengths: evaluation.strengths.map(sanitizeText)
+      }
+
       // Store the evaluation in the database
       const { data: storedEvaluation, error: dbError } = await supabase
         .from('evaluations')
-        .insert({
-          assignment_text: assignmentText,
-          instructions_text: instructionsText,
-          grade: evaluation.grade,
-          reasoning: evaluation.reasoning,
-          improvements: evaluation.improvements,
-          strengths: evaluation.strengths
-        })
+        .insert(sanitizedEvaluation)
         .select()
         .single()
 

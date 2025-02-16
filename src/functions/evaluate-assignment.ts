@@ -42,7 +42,7 @@ export const evaluateAssignment = async (
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.VITE_OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -93,4 +93,3 @@ const readPDFContent = async (file: File): Promise<string> => {
   // For now, return a simple text reading. We can enhance this later with PDF.js
   return await readTextContent(file);
 };
-

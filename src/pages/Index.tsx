@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const [assignmentText, setAssignmentText] = useState("");
@@ -56,13 +55,9 @@ const Index = () => {
 
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="p-6">
-            <Tabs defaultValue="assignment" className="space-y-6">
-              <TabsList className="grid grid-cols-2 w-full">
-                <TabsTrigger value="assignment">Din Opgave</TabsTrigger>
-                <TabsTrigger value="instructions">Opgavebeskrivelse</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="assignment" className="space-y-4">
+            <div className="space-y-8">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900">Din Opgave</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload din opgave</label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -98,9 +93,10 @@ const Index = () => {
                     className="min-h-[200px]"
                   />
                 </div>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="instructions" className="space-y-4">
+              <div className="space-y-4 pt-6 border-t border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload opgavebeskrivelsen</label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -136,19 +132,19 @@ const Index = () => {
                     className="min-h-[200px]"
                   />
                 </div>
-              </TabsContent>
-            </Tabs>
+              </div>
 
-            <div className="mt-6 text-center">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
-              >
-                <Upload className="mr-2 h-5 w-5" /> Bedøm opgave
-              </Button>
-              <p className="mt-4 text-sm text-gray-500">
-                * Login påkrævet for at se din karaktervurdering
-              </p>
+              <div className="mt-6 text-center pt-6 border-t border-gray-200">
+                <Button
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  <Upload className="mr-2 h-5 w-5" /> Bedøm opgave
+                </Button>
+                <p className="mt-4 text-sm text-gray-500">
+                  * Login påkrævet for at se din karaktervurdering
+                </p>
+              </div>
             </div>
           </Card>
         </div>

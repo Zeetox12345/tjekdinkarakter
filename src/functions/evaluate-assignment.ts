@@ -1,6 +1,4 @@
 
-import { FormData } from '@supabase/supabase-js';
-
 interface EvaluationResult {
   grade: string;
   reasoning: string;

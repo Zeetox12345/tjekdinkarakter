@@ -1,4 +1,6 @@
 
+import { supabase } from "@/integrations/supabase/client";
+
 interface EvaluationResult {
   grade: string;
   reasoning: string;
@@ -25,64 +27,19 @@ export const evaluateAssignment = async (
       instructionsContent = await readFileContent(instructionsFile);
     }
 
-    const prompt = `
-      Som en erfaren dansklærer, vurder venligst følgende opgave:
-      
-      ${instructionsContent ? `Opgavebeskrivelse:\n${instructionsContent}\n\n` : ''}
-      
-      Opgave:\n${assignmentContent}
-      
-      Giv venligst:
-      1. En karakter på 7-trinsskalaen
-      2. En detaljeret begrundelse for karakteren
-      3. Konkrete forbedringsforslag
-      4. Specifikke styrker ved opgaven
-
-      Svar venligst i følgende JSON format:
-      {
-        "grade": "karakter her",
-        "reasoning": "begrundelse her",
-        "improvements": ["forbedringsforslag 1", "forbedringsforslag 2"],
-        "strengths": ["styrke 1", "styrke 2"]
-      }
-    `;
-
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OpenAI API key is not configured');
-    }
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
+    const { data, error } = await supabase.functions.invoke('evaluate-assignment', {
+      body: {
+        assignmentText: assignmentContent,
+        instructionsText: instructionsContent,
       },
-      body: JSON.stringify({
-        model: 'gpt-4',
-        messages: [
-          { role: 'system', content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer altid i det specificerede JSON format.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-      }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenAI API Error:', errorData);
-      throw new Error(errorData.error?.message || 'Failed to evaluate assignment');
+    if (error) {
+      console.error('Evaluation Error:', error);
+      throw new Error('Failed to evaluate assignment');
     }
 
-    const data = await response.json();
-    const content = data.choices[0].message.content;
-    
-    try {
-      return JSON.parse(content);
-    } catch (parseError) {
-      console.error('Error parsing OpenAI response:', content);
-      throw new Error('Invalid response format from evaluation service');
-    }
+    return data;
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);
     throw error;

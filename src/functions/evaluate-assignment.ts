@@ -9,6 +9,11 @@ interface EvaluationResult {
   strengths: string[];
 }
 
+// Set up PDF.js worker
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+}
+
 export const evaluateAssignment = async (
   assignmentFile: File | null,
   assignmentText: string,
@@ -105,10 +110,6 @@ const readPDFContent = async (file: File): Promise<string> => {
     console.log('Reading PDF file:', file.name);
     const arrayBuffer = await file.arrayBuffer();
     const typedArray = new Uint8Array(arrayBuffer);
-    
-    // Set worker path for PDF.js
-    const pdfjsWorker = await import('pdfjs-dist/build/pdf.worker.entry');
-    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker.default;
     
     // Initialize PDF.js with the typed array
     console.log('Initializing PDF.js...');

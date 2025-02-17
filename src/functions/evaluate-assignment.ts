@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import * as pdfjs from 'pdfjs-dist';
 
@@ -98,8 +99,8 @@ const readFileContent = async (file: File): Promise<string> => {
       // Convert PDF to DOCX first
       console.log('Converting PDF to DOCX...');
       const docxContent = await convertPDFtoDOCX(file);
-      // Process the converted DOCX content
-      return await processDocxContent(docxContent);
+      console.log('PDF converted to DOCX successfully');
+      return docxContent;
     } else if (
       file.type === 'application/msword' || 
       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -116,29 +117,47 @@ const readFileContent = async (file: File): Promise<string> => {
 
 const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
   try {
-    console.log('Starting PDF to DOCX conversion');
+    console.log('Starting PDF to DOCX conversion for file:', pdfFile.name);
     
     // First extract text content from PDF
     const arrayBuffer = await pdfFile.arrayBuffer();
+    console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
+    
     const pdf = await pdfjs.getDocument(new Uint8Array(arrayBuffer)).promise;
+    console.log('PDF document loaded, pages:', pdf.numPages);
     
     let textContent = [];
     
     // Process each page
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      console.log(`Processing PDF page ${pageNum}/${pdf.numPages}`);
       const page = await pdf.getPage(pageNum);
       const content = await page.getTextContent();
       const pageText = content.items
         .map((item: any) => item.str)
+        .filter(str => str && str.trim()) // Filter out empty strings
         .join(' ');
-      textContent.push(pageText);
+      
+      if (pageText.trim()) {
+        textContent.push(pageText);
+        console.log(`Page ${pageNum} extracted content length:`, pageText.length);
+      }
     }
     
-    // Create a base64 representation of the content
-    const content = textContent.join('\n\n');
-    const contentBase64 = btoa(unescape(encodeURIComponent(content)));
+    // Join all text content
+    const fullContent = textContent.join('\n\n');
+    console.log('Total extracted content length:', fullContent.length);
+    
+    if (!fullContent.trim()) {
+      throw new Error('No text content could be extracted from PDF');
+    }
+    
+    // Encode content for API
+    const contentBase64 = btoa(unescape(encodeURIComponent(fullContent)));
+    console.log('Content encoded to base64');
     
     // Send to document processing API
+    console.log('Sending to document processing API...');
     const { data, error } = await supabase.functions.invoke('process-document', {
       body: { 
         fileName: pdfFile.name.replace('.pdf', '.docx'),
@@ -148,33 +167,20 @@ const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     });
 
     if (error) {
+      console.error('Document processing API error:', error);
       throw new Error(`Conversion failed: ${error.message}`);
     }
 
     if (!data?.text) {
+      console.error('No text received from document processor');
       throw new Error('No text content received from document processor');
     }
 
-    console.log('Successfully converted PDF to DOCX format');
+    console.log('Successfully received processed document, content length:', data.text.length);
     return data.text;
   } catch (error) {
     console.error('PDF to DOCX conversion failed:', error);
     throw new Error(`PDF to DOCX conversion failed: ${error.message}`);
-  }
-};
-
-const processDocxContent = async (content: string): Promise<string> => {
-  try {
-    console.log('Processing DOCX content, length:', content.length);
-    
-    if (!content.trim()) {
-      throw new Error('Empty content received from DOCX conversion');
-    }
-    
-    return content;
-  } catch (error) {
-    console.error('DOCX processing error:', error);
-    throw new Error(`Failed to process DOCX content: ${error.message}`);
   }
 };
 
@@ -204,10 +210,11 @@ const readWordContent = async (file: File): Promise<string> => {
 
     if (error) {
       console.error('Word processing error:', error);
-      throw new Error('Failed to process Word document');
+      throw new Error(`Failed to process Word document: ${error.message}`);
     }
 
     if (!data?.text) {
+      console.error('No text received from document processor');
       throw new Error('No text content received from document processor');
     }
 

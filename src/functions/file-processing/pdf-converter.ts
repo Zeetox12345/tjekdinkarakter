@@ -1,13 +1,16 @@
 
-import * as pdfjsLib from 'pdfjs-dist/build/pdf';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import * as pdfjsLib from 'pdfjs-dist';
 import { supabase } from "@/integrations/supabase/client";
 
 // Set up PDF.js worker
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+    // Import worker from the dist/build folder
+    pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url
+    ).toString();
     console.log('PDF.js worker setup complete');
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);

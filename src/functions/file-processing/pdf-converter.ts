@@ -24,8 +24,9 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(arrayBuffer),
-      disableWorker: true, // Disable worker to use built-in synchronous processing
-      isEvalSupported: false, // Disable eval for security
+      cMapUrl: undefined, // Disable external character maps
+      cMapPacked: true,
+      isEvalSupported: false // Disable eval for security
     });
     
     const pdf = await loadingTask.promise;

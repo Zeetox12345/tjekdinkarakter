@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+    // Use unpkg CDN which is more reliable for PDF.js
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
     console.log('PDF.js worker setup complete with version:', pdfjs.version);
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
@@ -20,6 +21,10 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     // Load the PDF file
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
+    
+    // Wait for worker to be ready
+    await pdfjs.getDocument({ data: new Uint8Array(0) }).promise.catch(() => {});
+    console.log('PDF.js worker is ready');
     
     // Create loading task with minimal configuration
     const loadingTask = pdfjs.getDocument({

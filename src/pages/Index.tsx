@@ -107,13 +107,16 @@ const Index = () => {
             
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-8"
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-4"
               onClick={handleEvaluate}
               disabled={isLoading}
             >
               <Upload className="mr-2 h-5 w-5" />
               {isLoading ? "Vurderer..." : "Bedøm opgave"}
             </Button>
+            <p className="text-sm text-gray-500">
+              * Tilføj opgavebeskrivelsen for en mere præcis vurdering
+            </p>
           </motion.div>
         </section>
 
@@ -220,9 +223,7 @@ const Index = () => {
             </div>
 
             <div className="mt-8 text-center pt-6 border-t border-gray-200">
-              <p className="mt-4 text-sm text-gray-500">
-                * Tilføj opgavebeskrivelsen for en mere præcis vurdering
-              </p>
+              {/* Note: Removed the text from here as it's now below the button */}
             </div>
           </Card>
         </div>

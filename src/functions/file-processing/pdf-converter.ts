@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-    pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
-    console.log('PDF.js worker setup complete with worker source:', workerSrc);
+    // Use the local worker bundle instead of CDN
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+    console.log('PDF.js worker setup complete');
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }
@@ -22,11 +22,14 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
+    // Configure PDF.js to use built-in fallback worker if external fails
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(arrayBuffer),
-      cMapUrl: undefined, // Disable external character maps
-      cMapPacked: true,
-      isEvalSupported: false // Disable eval for security
+      standardFontDataUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+      useSystemFonts: true,
+      useWorkerFetch: true,
+      isEvalSupported: false,
+      canvasMaxAreaInBytes: 100 * 1024 * 1024
     });
     
     const pdf = await loadingTask.promise;

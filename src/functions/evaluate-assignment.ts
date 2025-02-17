@@ -62,6 +62,23 @@ export const evaluateAssignment = async (
       throw new Error('No evaluation data received');
     }
 
+    // Store the evaluation in the database
+    const { error: insertError } = await supabase
+      .from('evaluations')
+      .insert({
+        grade: data.grade,
+        reasoning: data.reasoning,
+        improvements: data.improvements,
+        strengths: data.strengths,
+        assignment_text: assignmentContent,
+        instructions_text: instructionsContent || null,
+      });
+
+    if (insertError) {
+      console.error('Error storing evaluation:', insertError);
+      // Don't throw here, we still want to return the evaluation to the user
+    }
+
     return data;
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);

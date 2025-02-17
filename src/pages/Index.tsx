@@ -1,3 +1,4 @@
+
 import { Upload, AlertCircle, Star, FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,7 @@ const Index = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <section className="text-center mb-16">
+        <section className="text-center mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,10 +100,20 @@ const Index = () => {
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-4">
               Upload din opgave og få øjeblikkelig feedback
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
               Vi bruger avanceret AI-teknologi til at give dig en hurtig karaktervurdering,
               så du kan forbedre din opgave før endelig aflevering.
             </p>
+            
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-8"
+              onClick={handleEvaluate}
+              disabled={isLoading}
+            >
+              <Upload className="mr-2 h-5 w-5" />
+              {isLoading ? "Vurderer..." : "Bedøm opgave"}
+            </Button>
           </motion.div>
         </section>
 
@@ -209,15 +220,6 @@ const Index = () => {
             </div>
 
             <div className="mt-8 text-center pt-6 border-t border-gray-200">
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
-                onClick={handleEvaluate}
-                disabled={isLoading}
-              >
-                <Upload className="mr-2 h-5 w-5" />
-                {isLoading ? "Vurderer..." : "Bedøm opgave"}
-              </Button>
               <p className="mt-4 text-sm text-gray-500">
                 * Tilføj opgavebeskrivelsen for en mere præcis vurdering
               </p>

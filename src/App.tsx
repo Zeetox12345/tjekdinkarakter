@@ -9,7 +9,6 @@ import { MainNav } from "@/components/MainNav";
 import { useAuth } from "@/components/AuthProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import History from "./pages/History";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,7 +26,6 @@ const AppContent = () => {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
-        <Route path="/history" element={<History />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

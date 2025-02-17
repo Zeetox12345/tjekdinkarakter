@@ -1,4 +1,3 @@
-
 import { Upload, AlertCircle, Star, FileText, LockIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -100,20 +99,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="w-full py-6 px-4 sm:px-6 lg:px-8 border-b border-gray-100">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <img 
-            src="/lovable-uploads/eeabc36e-6411-43e4-8d8c-8b3a1c50d089.png" 
-            alt="TjekDinKarakter Logo" 
-            className="h-12 w-12"
-          />
-          <div>
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-              TjekDinKarakter<span className="text-blue-600">.dk</span>
-            </h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Få en hurtig, AI-drevet vurdering af din opgave
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+            TjekDinKarakter.dk
+          </h1>
+          <p className="mt-2 text-lg text-gray-600">
+            Få en hurtig, AI-drevet vurdering af din opgave
+          </p>
         </div>
       </header>
 

@@ -1,14 +1,14 @@
 
 import * as pdfjs from 'pdfjs-dist';
-import worker from 'pdfjs-dist/build/pdf.worker.entry';
 import { supabase } from "@/integrations/supabase/client";
 
 // Set up PDF.js worker
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    pdfjs.GlobalWorkerOptions.workerSrc = worker;
-    console.log('PDF.js worker setup complete with worker source:', worker);
+    const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+    pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+    console.log('PDF.js worker setup complete with worker source:', workerSrc);
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }

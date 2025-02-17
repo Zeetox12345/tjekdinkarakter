@@ -2,13 +2,13 @@
 import * as pdfjs from 'pdfjs-dist';
 import { supabase } from "@/integrations/supabase/client";
 
-// Set up PDF.js worker
+// Set up PDF.js worker with absolute HTTPS URL to ensure it works in all environments
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    // Use the local worker bundle instead of CDN
-    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-    console.log('PDF.js worker setup complete');
+    // Use jsdelivr CDN which is more reliable for npm packages
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+    console.log('PDF.js worker setup complete with version:', pdfjs.version);
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }
@@ -16,24 +16,21 @@ if (typeof window !== 'undefined') {
 
 export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
   try {
-    console.log('Starting PDF to DOCX conversion for file:', pdfFile.name);
+    console.log('Starting PDF text extraction for file:', pdfFile.name);
     
-    // First extract text content from PDF
+    // Load the PDF file
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Configure PDF.js to use built-in fallback worker if external fails
+    // Create loading task with minimal configuration to avoid issues
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(arrayBuffer),
-      standardFontDataUrl: `//cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
       useSystemFonts: true,
-      useWorkerFetch: true,
-      isEvalSupported: false,
-      canvasMaxAreaInBytes: 100 * 1024 * 1024
+      standardFontDataUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
     });
     
     const pdf = await loadingTask.promise;
-    console.log('PDF document loaded, pages:', pdf.numPages);
+    console.log('PDF document loaded successfully, pages:', pdf.numPages);
     
     let textContent = [];
     
@@ -49,12 +46,12 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
       
       if (pageText.trim()) {
         textContent.push(pageText);
-        console.log(`Page ${pageNum} extracted content length:`, pageText.length);
+        console.log(`Page ${pageNum} text extracted, length:`, pageText.length);
       }
     }
     
     const fullContent = textContent.join('\n\n');
-    console.log('Total extracted content length:', fullContent.length);
+    console.log('Total extracted text length:', fullContent.length);
     
     if (!fullContent.trim()) {
       throw new Error('No text content could be extracted from PDF');
@@ -63,6 +60,7 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const contentBase64 = btoa(unescape(encodeURIComponent(fullContent)));
     console.log('Content encoded to base64');
     
+    // Send the extracted text to the API
     const { data, error } = await supabase.functions.invoke('process-document', {
       body: { 
         fileName: pdfFile.name.replace('.pdf', '.docx'),
@@ -73,7 +71,7 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
 
     if (error) {
       console.error('Document processing API error:', error);
-      throw new Error(`Conversion failed: ${error.message}`);
+      throw new Error(`Processing failed: ${error.message}`);
     }
 
     if (!data?.text) {
@@ -81,10 +79,10 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
       throw new Error('No text content received from document processor');
     }
 
-    console.log('Successfully received processed document, content length:', data.text.length);
+    console.log('Successfully processed document, content length:', data.text.length);
     return data.text;
   } catch (error) {
-    console.error('PDF to DOCX conversion failed:', error);
-    throw new Error(`PDF to DOCX conversion failed: ${error.message}`);
+    console.error('PDF processing failed:', error);
+    throw new Error(`PDF processing failed: ${error.message}`);
   }
 };

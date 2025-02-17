@@ -1,14 +1,13 @@
 
 import * as pdfjs from 'pdfjs-dist';
-import { pdfjsWorker } from 'pdfjs-dist/build/pdf.worker.mjs';
 import { supabase } from "@/integrations/supabase/client";
 
-// Set up PDF.js worker with direct import
+// Set up PDF.js worker
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
-    console.log('PDF.js worker setup complete');
+    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+    console.log('PDF.js worker setup complete with version:', pdfjs.version);
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }
@@ -74,7 +73,7 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     }
 
     console.log('Successfully processed evaluation');
-    return fullContent; // Return the extracted text
+    return fullContent;
   } catch (error) {
     console.error('PDF processing failed:', error);
     throw new Error(`PDF processing failed: ${error.message}`);

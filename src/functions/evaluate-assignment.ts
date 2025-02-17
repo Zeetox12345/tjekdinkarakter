@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import * as pdfjs from 'pdfjs-dist';
 
@@ -96,7 +95,11 @@ const readFileContent = async (file: File): Promise<string> => {
     console.log('Starting to read file:', file.name, file.type);
     
     if (file.type === 'application/pdf') {
-      return await readPDFContent(file);
+      // Convert PDF to DOCX first
+      console.log('Converting PDF to DOCX...');
+      const docxContent = await convertPDFtoDOCX(file);
+      // Process the converted DOCX content
+      return await processDocxContent(docxContent);
     } else if (
       file.type === 'application/msword' || 
       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -111,54 +114,67 @@ const readFileContent = async (file: File): Promise<string> => {
   }
 };
 
-const readPDFContent = async (file: File): Promise<string> => {
+const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
   try {
-    console.log('Starting PDF processing for:', file.name);
-
-    // Load file as ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    console.log('File loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
-
-    // Load the PDF document
-    console.log('Loading PDF document...');
-    const pdf = await pdfjs.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
-    console.log('PDF loaded, pages:', pdf.numPages);
-
-    let allContent: string[] = [];
-
+    console.log('Starting PDF to DOCX conversion');
+    
+    // First extract text content from PDF
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdf = await pdfjs.getDocument(new Uint8Array(arrayBuffer)).promise;
+    
+    let textContent = [];
+    
     // Process each page
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      try {
-        console.log(`Processing page ${pageNum}/${pdf.numPages}`);
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        
-        const pageText = textContent.items
-          .map((item: any) => item.str || '')
-          .join(' ')
-          .trim();
-
-        if (pageText) {
-          allContent.push(pageText);
-          console.log(`Page ${pageNum} content length:`, pageText.length);
-        }
-
-      } catch (pageError) {
-        console.error(`Error on page ${pageNum}:`, pageError);
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const pageText = content.items
+        .map((item: any) => item.str)
+        .join(' ');
+      textContent.push(pageText);
+    }
+    
+    // Create a base64 representation of the content
+    const content = textContent.join('\n\n');
+    const contentBase64 = btoa(unescape(encodeURIComponent(content)));
+    
+    // Send to document processing API
+    const { data, error } = await supabase.functions.invoke('process-document', {
+      body: { 
+        fileName: pdfFile.name.replace('.pdf', '.docx'),
+        fileContent: contentBase64,
+        sourceFormat: 'pdf'
       }
+    });
+
+    if (error) {
+      throw new Error(`Conversion failed: ${error.message}`);
     }
 
-    const finalContent = allContent.join('\n\n').trim();
-    console.log('Total extracted content length:', finalContent.length);
-
-    if (!finalContent) {
-      throw new Error('No content could be extracted from PDF');
+    if (!data?.text) {
+      throw new Error('No text content received from document processor');
     }
 
-    return finalContent;
+    console.log('Successfully converted PDF to DOCX format');
+    return data.text;
   } catch (error) {
-    console.error('PDF processing failed:', error);
-    throw new Error(`PDF processing failed: ${error.message}`);
+    console.error('PDF to DOCX conversion failed:', error);
+    throw new Error(`PDF to DOCX conversion failed: ${error.message}`);
+  }
+};
+
+const processDocxContent = async (content: string): Promise<string> => {
+  try {
+    console.log('Processing DOCX content, length:', content.length);
+    
+    if (!content.trim()) {
+      throw new Error('Empty content received from DOCX conversion');
+    }
+    
+    return content;
+  } catch (error) {
+    console.error('DOCX processing error:', error);
+    throw new Error(`Failed to process DOCX content: ${error.message}`);
   }
 };
 

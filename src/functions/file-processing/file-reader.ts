@@ -1,5 +1,5 @@
 
-import { extractPDFText } from './pdf-converter';
+import { convertPDFtoDOCX } from './pdf-converter';
 import { readWordContent } from './word-processor';
 import { readTextContent } from './text-processor';
 
@@ -8,10 +8,10 @@ export const readFileContent = async (file: File): Promise<string> => {
     console.log('Starting to read file:', file.name, file.type);
     
     if (file.type === 'application/pdf') {
-      console.log('Extracting text from PDF...');
-      const textContent = await extractPDFText(file);
-      console.log('PDF text extracted successfully');
-      return textContent;
+      console.log('Converting PDF to DOCX...');
+      const docxContent = await convertPDFtoDOCX(file);
+      console.log('PDF converted to DOCX successfully');
+      return docxContent;
     } else if (
       file.type === 'application/msword' || 
       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'

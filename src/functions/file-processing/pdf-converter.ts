@@ -1,14 +1,13 @@
 
 import * as pdfjs from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs';
 import { supabase } from "@/integrations/supabase/client";
 
-// Set up PDF.js worker with absolute HTTPS URL to ensure it works in all environments
+// Set up PDF.js worker with direct import
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    // Using a different CDN approach
-    const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).href;
-    pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
     console.log('PDF.js worker setup complete');
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);

@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    // Use jsdelivr CDN which is more reliable for npm packages
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-    console.log('PDF.js worker setup complete with version:', pdfjs.version);
+    // Using a different CDN approach
+    const workerUrl = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).href;
+    pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+    console.log('PDF.js worker setup complete');
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }
@@ -22,11 +23,10 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Create loading task with minimal configuration to avoid issues
+    // Create loading task with minimal configuration
     const loadingTask = pdfjs.getDocument({
       data: new Uint8Array(arrayBuffer),
       useSystemFonts: true,
-      standardFontDataUrl: `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
     });
     
     const pdf = await loadingTask.promise;
@@ -57,30 +57,25 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
       throw new Error('No text content could be extracted from PDF');
     }
     
-    const contentBase64 = btoa(unescape(encodeURIComponent(fullContent)));
-    console.log('Content encoded to base64');
-    
-    // Send the extracted text to the API
-    const { data, error } = await supabase.functions.invoke('process-document', {
+    // Send the extracted text directly to the evaluation function
+    const { data, error } = await supabase.functions.invoke('evaluate-assignment', {
       body: { 
-        fileName: pdfFile.name.replace('.pdf', '.docx'),
-        fileContent: contentBase64,
-        sourceFormat: 'pdf'
+        assignmentText: fullContent,
       }
     });
 
     if (error) {
-      console.error('Document processing API error:', error);
-      throw new Error(`Processing failed: ${error.message}`);
+      console.error('Evaluation API error:', error);
+      throw new Error(`Evaluation failed: ${error.message}`);
     }
 
-    if (!data?.text) {
-      console.error('No text received from document processor');
-      throw new Error('No text content received from document processor');
+    if (!data) {
+      console.error('No evaluation data received');
+      throw new Error('No evaluation data received from API');
     }
 
-    console.log('Successfully processed document, content length:', data.text.length);
-    return data.text;
+    console.log('Successfully processed evaluation');
+    return fullContent; // Return the extracted text
   } catch (error) {
     console.error('PDF processing failed:', error);
     throw new Error(`PDF processing failed: ${error.message}`);

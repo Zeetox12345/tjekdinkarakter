@@ -2,11 +2,19 @@
 import * as pdfjs from 'pdfjs-dist';
 import { supabase } from "@/integrations/supabase/client";
 
-// Set up PDF.js worker with absolute HTTPS URL
+// Set up PDF.js worker
 if (typeof window !== 'undefined') {
-  const workerUrl = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
-  console.log('Setting up PDF.js worker at:', workerUrl);
-  pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+  try {
+    console.log('Setting up PDF.js worker');
+    // Use the worker directly from the package
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.js',
+      import.meta.url
+    ).toString();
+    console.log('PDF.js worker setup complete');
+  } catch (error) {
+    console.error('Error setting up PDF.js worker:', error);
+  }
 }
 
 export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
@@ -17,7 +25,13 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    const pdf = await pdfjs.getDocument(new Uint8Array(arrayBuffer)).promise;
+    const pdf = await pdfjs.getDocument({
+      data: new Uint8Array(arrayBuffer),
+      useWorkerFetch: false, // Disable worker fetch to prevent CORS issues
+      isEvalSupported: false, // Disable eval for security
+      standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`
+    }).promise;
+    
     console.log('PDF document loaded, pages:', pdf.numPages);
     
     let textContent = [];

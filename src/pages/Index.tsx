@@ -1,6 +1,5 @@
-
-import { Upload, AlertCircle, Star, FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import { Upload, AlertCircle, Star, FileText, LockIcon } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,8 +8,20 @@ import { useToast } from "@/components/ui/use-toast";
 import EvaluationResult from "@/components/EvaluationResult";
 import { Progress } from "@/components/ui/progress";
 import { evaluateAssignment } from "@/functions/evaluate-assignment";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Index = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [assignmentText, setAssignmentText] = useState("");
   const [instructionsText, setInstructionsText] = useState("");
   const [assignmentFile, setAssignmentFile] = useState<File | null>(null);
@@ -30,6 +41,14 @@ const Index = () => {
     if (e.target.files && e.target.files[0]) {
       setInstructionsFile(e.target.files[0]);
     }
+  };
+
+  const handleEvaluateClick = () => {
+    if (!user) {
+      setShowAuthDialog(true);
+      return;
+    }
+    handleEvaluate();
   };
 
   const handleEvaluate = async () => {
@@ -108,7 +127,7 @@ const Index = () => {
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-4"
-              onClick={handleEvaluate}
+              onClick={handleEvaluateClick}
               disabled={isLoading}
             >
               <Upload className="mr-2 h-5 w-5" />
@@ -119,6 +138,54 @@ const Index = () => {
             </p>
           </motion.div>
         </section>
+
+        <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Log ind for at fortsætte</DialogTitle>
+              <DialogDescription>
+                For at få din opgave vurderet skal du oprette en konto eller logge ind.
+              </DialogDescription>
+            </DialogHeader>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col items-center space-y-4 pt-4"
+            >
+              <div className="rounded-full bg-primary/10 p-4">
+                <LockIcon className="h-6 w-6 text-primary" />
+              </div>
+              <p className="text-center text-sm text-gray-600 mb-4">
+                Ved at oprette en konto kan du:
+                <br />• Få detaljerede opgavevurderinger
+                <br />• Gemme dine tidligere vurderinger
+                <br />• Følge din progression over tid
+              </p>
+              <div className="flex gap-4 w-full">
+                <Button 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={() => {
+                    setShowAuthDialog(false);
+                    navigate("/auth");
+                  }}
+                >
+                  Log ind
+                </Button>
+                <Button 
+                  className="flex-1"
+                  onClick={() => {
+                    setShowAuthDialog(false);
+                    navigate("/auth");
+                  }}
+                >
+                  Opret konto
+                </Button>
+              </div>
+            </motion.div>
+          </DialogContent>
+        </Dialog>
 
         {isLoading && (
           <div className="max-w-xl mx-auto mb-8">
@@ -141,7 +208,6 @@ const Index = () => {
         <div className="max-w-7xl mx-auto mb-16">
           <Card className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Instructions Section */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
                 <div className="space-y-2">
@@ -181,7 +247,6 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Assignment Section */}
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-gray-900">Din Opgave</h3>
                 <div className="space-y-2">

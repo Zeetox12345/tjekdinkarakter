@@ -1,6 +1,6 @@
 
 import * as pdfjs from 'pdfjs-dist';
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.mjs';
+import { pdfjsWorker } from 'pdfjs-dist/build/pdf.worker.mjs';
 import { supabase } from "@/integrations/supabase/client";
 
 // Set up PDF.js worker with direct import

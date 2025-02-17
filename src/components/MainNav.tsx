@@ -37,8 +37,15 @@ export function MainNav({ user }: { user: User | null }) {
   return (
     <nav className="border-b">
       <div className="flex h-16 items-center px-4 container mx-auto">
-        <Link to="/" className="font-bold text-xl">
-          TjekDinKarakter.dk
+        <Link to="/" className="flex items-center gap-2">
+          <img 
+            src="/lovable-uploads/eeabc36e-6411-43e4-8d8c-8b3a1c50d089.png" 
+            alt="TjekDinKarakter Logo" 
+            className="h-8 w-8"
+          />
+          <span className="font-bold text-xl bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            TjekDinKarakter<span className="text-blue-600">.dk</span>
+          </span>
         </Link>
         <div className="ml-auto flex items-center space-x-4">
           {user ? (

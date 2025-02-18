@@ -51,15 +51,29 @@ serve(async (req) => {
     }
 
     const prompt = `
-      Som en erfaren dansklærer, vurder venligst følgende opgave:
+      Du er en erfaren dansklærer, der skal vurdere følgende opgavebesvarelse på den danske 7-trinsskala (-3, 00, 02, 4, 7, 10, 12).
+
+      ${sanitizedInstructionsText ? `OPGAVEBESKRIVELSE:\n${sanitizedInstructionsText}\n\n` : ''}
       
-      ${sanitizedInstructionsText ? `Opgavebeskrivelse:\n${sanitizedInstructionsText}\n\n` : ''}
+      OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
-      Opgave:\n${sanitizedAssignmentText}
+      VIGTIGE RETNINGSLINJER:
+      1. Bedøm KUN opgavebesvarelsen - ikke opgavebeskrivelsen
+      2. Hvis besvarelsen er meget kort, ukomplet eller irrelevant i forhold til opgavebeskrivelsen, skal du give en lav karakter (-3, 00 eller 02)
+      3. Vær kritisk og realistisk i din bedømmelse
+      4. Giv en detaljeret begrundelse for karakteren
+      5. Bemærk særligt:
+         - -3: Gives for den ringe præstation der ikke demonstrerer acceptabel grad af målopfyldelse
+         - 00: Gives for den utilstrækkelige præstation der ikke demonstrerer acceptabel grad af målopfyldelse
+         - 02: Gives for den tilstrækkelige præstation der demonstrerer den minimalt acceptable grad af målopfyldelse
+         - 4: Gives for den jævne præstation der demonstrerer en mindre grad af opfyldelse af fagets mål
+         - 7: Gives for den gode præstation der demonstrerer opfyldelse af fagets mål med en del mangler
+         - 10: Gives for den fortrinlige præstation der demonstrerer omfattende opfyldelse af fagets mål med nogle få uvæsentlige mangler
+         - 12: Gives for den fremragende præstation der demonstrerer udtømmende opfyldelse af fagets mål uden mangler
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
-        "grade": "karakteren her",
+        "grade": "karakteren her (-3, 00, 02, 4, 7, 10 eller 12)",
         "reasoning": "begrundelse her",
         "improvements": ["forbedring 1", "forbedring 2"],
         "strengths": ["styrke 1", "styrke 2"]
@@ -77,7 +91,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
+            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke. Du er meget kritisk og giver realistiske karakterer på 7-trinsskalaen.' 
           },
           { role: 'user', content: prompt }
         ],

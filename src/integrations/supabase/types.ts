@@ -19,6 +19,7 @@ export type Database = {
           instructions_text: string | null
           reasoning: string
           strengths: string[]
+          user_id: string | null
         }
         Insert: {
           assignment_text: string
@@ -29,6 +30,7 @@ export type Database = {
           instructions_text?: string | null
           reasoning: string
           strengths: string[]
+          user_id?: string | null
         }
         Update: {
           assignment_text?: string
@@ -39,6 +41,7 @@ export type Database = {
           instructions_text?: string | null
           reasoning?: string
           strengths?: string[]
+          user_id?: string | null
         }
         Relationships: []
       }

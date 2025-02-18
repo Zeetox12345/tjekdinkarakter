@@ -57,60 +57,58 @@ serve(async (req) => {
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
       VIGTIGE RETNINGSLINJER FOR VURDERING:
-      1. Vurder primært hvor godt opgavebesvarelsen besvarer kravene fra opgaveformuleringen:
-         - Er alle væsentlige delspørgsmål besvaret?
-         - Er der en fornuftig balance mellem delene?
-         - Viser besvarelsen forståelse for opgavens kernepunkter?
+      1. Vurder primært opgavens indhold og forståelse:
+         - Er hovedpunkterne i opgaven besvaret?
+         - Viser besvarelsen god forståelse for emnet?
+         - Er der en rød tråd gennem opgaven?
       
       2. Vurder den faglige kvalitet ud fra:
-         A. Primære kriterier (vægter tungest):
-            - Relevant brug af fagbegreber og teori
-            - Sammenhæng mellem analyse og konklusion
-            - Besvarelse af opgavens hovedspørgsmål
-            - Fornuftig argumentation
+         A. Primære kriterier:
+            - Viser besvarelsen god faglig forståelse?
+            - Er der sammenhæng mellem analyse og konklusion?
+            - Er argumentationen fornuftig?
          B. Sekundære kriterier:
-            - Struktur og præsentation
-            - Kildehenvisninger
-            - Sproglig formidling
+            - Er sproget klart og forståeligt?
+            - Er opgaven velstruktureret?
+            - Er kilderne dokumenteret?
       
       3. Karaktergivning skal følge disse retningslinjer:
-         - 12: Den fremragende besvarelse:
-           * Besvarer alle væsentlige dele af opgaven
-           * Viser god forståelse for emnet
-           * Bruger relevant teori og fagbegreber
-           * Har velunderbyggede konklusioner
-           * Har få eller ingen væsentlige mangler
-         - 10: Den rigtig gode besvarelse:
-           * Dækker det meste af opgaven grundigt
-           * Viser god faglig forståelse
-           * Har enkelte mindre mangler
-           * Bruger teori og fagbegreber fornuftigt
-         - 7: Den gode besvarelse:
-           * Behandler de vigtigste dele af opgaven
-           * Viser grundlæggende forståelse
-           * Har nogle mangler, men ikke afgørende
-         - 4: Den jævne besvarelse:
-           * Mangler væsentlige dele
-           * Har flere faglige fejl
+         - 12: Den fremragende besvarelse der:
+           * Viser sikker forståelse for emnet
+           * Har en god rød tråd
+           * Bruger teori og begreber fornuftigt
+           * Har velunderbyggede pointer
+           * Mindre mangler accepteres
+         - 10: Den meget gode besvarelse der:
+           * Viser god forståelse
+           * Har fornuftig brug af teori
+           * Har få mindre mangler
+           * Er generelt velskrevet
+         - 7: Den gode besvarelse der:
+           * Viser rimelig forståelse
+           * Har nogle mangler
+           * Er nogenlunde velskrevet
+         - 4: Den jævne besvarelse der:
            * Viser begrænset forståelse
-         - 02: Den tilstrækkelige besvarelse:
-           * Har store mangler
-           * Viser minimal forståelse
+           * Har flere væsentlige mangler
+         - 02: Den tilstrækkelige besvarelse
          - 00: Den utilstrækkelige besvarelse
          - -3: Den helt uacceptable besvarelse
       
-      4. Husk at belønne:
-         - God behandling af opgavens hovedpunkter
-         - Relevant brug af teori
-         - Fornuftige argumenter og eksempler
-         - God struktur
-         - Relevant dokumentation
+      4. Vigtige positive elementer der skal belønnes:
+         - God forståelse for emnet
+         - Fornuftig brug af teori
+         - God sammenhæng i opgaven
+         - Velargumenterede pointer
+         - Relevant brug af kilder
       
-      5. Vær særligt opmærksom på:
-         - Undgå at straffe mindre formelle fejl for hårdt
-         - Se på helheden frem for enkelte mangler
-         - Beløn gode elementer, selv hvis andre dele er svagere
-         - Vurder om eventuelle mangler er afgørende for forståelsen
+      5. Særlige retningslinjer:
+         - Fokuser på det positive frem for manglerne
+         - Giv 12 når opgaven viser god forståelse og sammenhæng, også selvom der er mindre mangler
+         - Giv 10 når opgaven er generelt god med få mangler
+         - Vær særligt opmærksom på at belønne god faglig forståelse
+         - Lad ikke mindre formelle fejl trække ned
+         - Se på helheden frem for detaljer
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -132,7 +130,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren lærer der vurderer opgaver. Se på opgavens helhed og vær ikke for hård ved mindre mangler. God brug af teori og behandling af hovedpunkterne er vigtigere end perfekt form. Beløn gerne gode elementer selv hvis andre dele er svagere. Giv karakterer ud fra en helhedsvurdering frem for at fokusere på enkelte fejl. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
+            content: 'Du er en erfaren lærer der vurderer opgaver. Fokuser på det positive og giv høje karakterer når opgaven viser god forståelse, også selvom der er mindre mangler. Se på helheden frem for enkelte fejl. Vær særligt opmærksom på at belønne god faglig forståelse og sammenhæng i opgaven. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],

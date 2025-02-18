@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -58,30 +57,41 @@ serve(async (req) => {
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
       VIGTIGE RETNINGSLINJER FOR VURDERING:
-      1. Bedøm opgavebesvarelsen primært ud fra hvor godt den besvarer kravene i opgaveformuleringen
+      1. Vurder primært hvor godt opgavebesvarelsen opfylder kravene fra opgaveformuleringen
       2. Vurder besvarelsen ud fra disse kriterier i prioriteret rækkefølge:
          A. Primære kriterier (vægter tungest):
-            - Besvarelse af alle delspørgsmål fra opgaveformuleringen
-            - Dybde og præcision i analysen af det krævede materiale
-            - Relevant brug af faglige begreber og teori i forhold til opgaven
+            - Grundig og udtømmende besvarelse af ALLE delspørgsmål fra opgaveformuleringen
+            - Fremragende analyse og fortolkning med selvstændig brug af relevante fagbegreber
+            - Evne til at kombinere teori og analyse på en overbevisende måde
+            - Velstruktureret argumentation med klar rød tråd
          B. Sekundære kriterier:
-            - Struktur og sammenhæng i besvarelsen
-            - Korrekt kildehenvisning og dokumentation
-            - Sprog og formidling
+            - Korrekt anvendelse af kilder og dokumentation
+            - Akademisk sprog og formidling
+            - God struktur med indholdsfortegnelse og logisk opbygning
       3. Karaktergivning skal følge disse retningslinjer:
-         - 12: Fremragende besvarelse der opfylder alle opgavekrav med dybde og præcision. Særligt god analyse og brug af relevante faglige begreber
-         - 10: Fortrinlig besvarelse der opfylder alle opgavekrav godt med kun få uvæsentlige mangler
-         - 7: God besvarelse der opfylder de fleste opgavekrav, men med nogle mangler i analysen eller teorien
-         - 4: Jævn besvarelse der kun delvist opfylder opgavekrav eller mangler dybde
-         - 02: Tilstrækkelig besvarelse der kun minimalt besvarer opgavekravene
-         - 00: Utilstrækkelig besvarelse der ikke besvarer væsentlige opgavekrav
-         - -3: Ingen reel besvarelse af opgavekravene
-      4. Vær opmærksom på at belønne:
-         - Særligt god analyse af det krævede materiale
-         - Selvstændig og velargumenteret brug af teori
-         - God kobling mellem teori og analyse
+         - 12: Gives for den FREMRAGENDE præstation der:
+           * Besvarer ALLE opgavekrav udtømmende og selvstændigt
+           * Viser excellent analyse og brug af fagbegreber
+           * Har særdeles velargumenterede pointer
+           * Demonstrerer fremragende evne til at kombinere teori og analyse
+           * Har fejlfri dokumentation og akademisk sprog
+         - 10: En fortrinlig besvarelse med få uvæsentlige mangler
+         - 7: En god besvarelse med nogle mangler
+         - 4: En jævn besvarelse med flere væsentlige mangler
+         - 02: En tilstrækkelig besvarelse med store mangler
+         - 00: En utilstrækkelig besvarelse
+         - -3: En helt uacceptabel præstation
+      4. Vær særligt opmærksom på at belønne:
+         - Selvstændig og dyb analyse
+         - Evne til at kombinere teori og analyse på sofistikeret vis
+         - Velunderbygget argumentation
          - Grundig behandling af alle opgavens dele
-      5. Giv en detaljeret begrundelse der relaterer til opgavekravene
+         - God struktur og rød tråd gennem opgaven
+      5. For at få topkarakteren 12 skal besvarelsen:
+         - Vise fremragende forståelse af alle aspekter af opgaven
+         - Have særdeles velargumenterede pointer
+         - Demonstrere selvstændig analyse og brug af relevante fagbegreber
+         - Have en klar rød tråd og logisk struktur
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -103,7 +113,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Vær særligt opmærksom på at belønne opgaver der grundigt besvarer alle krav fra opgaveformuleringen. En opgave der viser fremragende forståelse og analyse fortjener topkarakter. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
+            content: 'Du er en erfaren dansklærer der vurderer opgaver. Fremragende besvarelser der viser dyb forståelse, selvstændig analyse og grundig behandling af alle opgavekrav fortjener topkarakteren 12. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],

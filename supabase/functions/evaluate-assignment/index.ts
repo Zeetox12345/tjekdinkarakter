@@ -57,50 +57,60 @@ serve(async (req) => {
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
       VIGTIGE RETNINGSLINJER FOR VURDERING:
-      1. Vurder primært hvor godt opgavebesvarelsen opfylder kravene fra opgaveformuleringen ved at:
-         - Kontrollere at ALLE delspørgsmål er besvaret grundigt
-         - Vurdere dybden og kvaliteten af analysen for hvert delspørgsmål
-         - Se på sammenhængen mellem delkonklusioner og hovedkonklusion
+      1. Vurder primært hvor godt opgavebesvarelsen besvarer kravene fra opgaveformuleringen:
+         - Er alle væsentlige delspørgsmål besvaret?
+         - Er der en fornuftig balance mellem delene?
+         - Viser besvarelsen forståelse for opgavens kernepunkter?
       
-      2. Vurder den akademiske kvalitet ud fra:
+      2. Vurder den faglige kvalitet ud fra:
          A. Primære kriterier (vægter tungest):
-            - Dybdegående analyse med relevant brug af fagbegreber og modeller
-            - Selvstændig anvendelse af teori på case/empiri
-            - Velargumenterede konklusioner baseret på analysen
-            - Kritisk vurdering og diskussion af resultater
+            - Relevant brug af fagbegreber og teori
+            - Sammenhæng mellem analyse og konklusion
+            - Besvarelse af opgavens hovedspørgsmål
+            - Fornuftig argumentation
          B. Sekundære kriterier:
-            - Struktur og rød tråd
-            - Kildeanvendelse og dokumentation
-            - Sprog og formidling
+            - Struktur og præsentation
+            - Kildehenvisninger
+            - Sproglig formidling
       
       3. Karaktergivning skal følge disse retningslinjer:
-         - 12: Gives for den FREMRAGENDE præstation hvor:
-           * Alle opgavekrav er udtømmende besvaret
-           * Analysen er særdeles dybtgående og selvstændig
-           * Teorier og modeller anvendes præcist og med stor indsigt
-           * Argumentationen er overbevisende og velunderbygget
-           * Konklusioner følger logisk af analyserne
-           * Der vises kritisk sans og selvstændig vurdering
-         - 10: Fortrinlig besvarelse der opfylder næsten alle krav til 12
-         - 7: God besvarelse med flere gode elementer men ikke alle dele er lige vellykkede
-         - 4: Jævn besvarelse med flere mangler i analyse og argumentation
-         - 02: Tilstrækkelig besvarelse der kun minimalt besvarer opgavekravene
-         - 00: Utilstrækkelig besvarelse
-         - -3: Helt uacceptabel præstation
+         - 12: Den fremragende besvarelse:
+           * Besvarer alle væsentlige dele af opgaven
+           * Viser god forståelse for emnet
+           * Bruger relevant teori og fagbegreber
+           * Har velunderbyggede konklusioner
+           * Har få eller ingen væsentlige mangler
+         - 10: Den rigtig gode besvarelse:
+           * Dækker det meste af opgaven grundigt
+           * Viser god faglig forståelse
+           * Har enkelte mindre mangler
+           * Bruger teori og fagbegreber fornuftigt
+         - 7: Den gode besvarelse:
+           * Behandler de vigtigste dele af opgaven
+           * Viser grundlæggende forståelse
+           * Har nogle mangler, men ikke afgørende
+         - 4: Den jævne besvarelse:
+           * Mangler væsentlige dele
+           * Har flere faglige fejl
+           * Viser begrænset forståelse
+         - 02: Den tilstrækkelige besvarelse:
+           * Har store mangler
+           * Viser minimal forståelse
+         - 00: Den utilstrækkelige besvarelse
+         - -3: Den helt uacceptable besvarelse
       
-      4. Særligt positive elementer der skal belønnes:
-         - Grundig behandling af alle opgavens dele
-         - Selvstændig analyse der går ud over det åbenlyse
-         - God brug af relevant teori og modeller
-         - Velargumenterede konklusioner
-         - God struktur og rød tråd
-         - Relevant brug af kilder og data
+      4. Husk at belønne:
+         - God behandling af opgavens hovedpunkter
+         - Relevant brug af teori
+         - Fornuftige argumenter og eksempler
+         - God struktur
+         - Relevant dokumentation
       
-      5. Ved erhvervsøkonomiske opgaver, læg særlig vægt på:
-         - Anvendelse af relevante analysemodeller (PEST, Five Forces etc.)
-         - Kobling mellem teori og praktisk analyse
-         - Dybde i markedsanalysen
-         - Velunderbyggede strategiske anbefalinger
+      5. Vær særligt opmærksom på:
+         - Undgå at straffe mindre formelle fejl for hårdt
+         - Se på helheden frem for enkelte mangler
+         - Beløn gode elementer, selv hvis andre dele er svagere
+         - Vurder om eventuelle mangler er afgørende for forståelsen
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -122,7 +132,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren lærer der vurderer opgaver. Fremragende besvarelser der viser dyb analyse, selvstændig brug af teori og modeller, samt grundig behandling af alle opgavekrav fortjener topkarakterer. Vær særlig opmærksom på at belønne god brug af analysemodeller og velunderbyggede konklusioner i erhvervsøkonomiske opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
+            content: 'Du er en erfaren lærer der vurderer opgaver. Se på opgavens helhed og vær ikke for hård ved mindre mangler. God brug af teori og behandling af hovedpunkterne er vigtigere end perfekt form. Beløn gerne gode elementer selv hvis andre dele er svagere. Giv karakterer ud fra en helhedsvurdering frem for at fokusere på enkelte fejl. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],

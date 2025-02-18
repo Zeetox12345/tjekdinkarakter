@@ -58,24 +58,30 @@ serve(async (req) => {
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
       VIGTIGE RETNINGSLINJER FOR VURDERING:
-      1. Bedøm KUN opgavebesvarelsen - ikke opgavebeskrivelsen
-      2. Vurder besvarelsen ud fra følgende akademiske kriterier:
-         - Struktur og sammenhæng i besvarelsen
-         - Dybde i analyse og argumentation
-         - Brug af faglige begreber og teori
-         - Korrekt kildehenvisning og dokumentation
-         - Sprog og formidling
-         - Besvarelse af alle opgavens delspørgsmål
-      3. Vær konsekvent i karaktergivningen og følg disse retningslinjer:
-         - 12: Fremragende besvarelse med selvstændig analyse, velargumenteret, akademisk sprog, korrekte henvisninger
-         - 10: Fortrinlig besvarelse med god analyse, få mangler, akademisk sprog, korrekte henvisninger
-         - 7: God besvarelse med anályse og argumentation, men med nogle mangler
-         - 4: Jævn besvarelse med simple analyser og basic argumentation
-         - 02: Tilstrækkelig besvarelse med betydelige mangler
-         - 00: Utilstrækkelig besvarelse med store mangler
-         - -3: Helt utilstrækkelig besvarelse eller ingen relevant besvarelse
-      4. For korte eller irrelevante besvarelser skal have lave karakterer (-3, 00, 02)
-      5. Giv en detaljeret begrundelse baseret på de akademiske kriterier
+      1. Bedøm opgavebesvarelsen primært ud fra hvor godt den besvarer kravene i opgaveformuleringen
+      2. Vurder besvarelsen ud fra disse kriterier i prioriteret rækkefølge:
+         A. Primære kriterier (vægter tungest):
+            - Besvarelse af alle delspørgsmål fra opgaveformuleringen
+            - Dybde og præcision i analysen af det krævede materiale
+            - Relevant brug af faglige begreber og teori i forhold til opgaven
+         B. Sekundære kriterier:
+            - Struktur og sammenhæng i besvarelsen
+            - Korrekt kildehenvisning og dokumentation
+            - Sprog og formidling
+      3. Karaktergivning skal følge disse retningslinjer:
+         - 12: Fremragende besvarelse der opfylder alle opgavekrav med dybde og præcision. Særligt god analyse og brug af relevante faglige begreber
+         - 10: Fortrinlig besvarelse der opfylder alle opgavekrav godt med kun få uvæsentlige mangler
+         - 7: God besvarelse der opfylder de fleste opgavekrav, men med nogle mangler i analysen eller teorien
+         - 4: Jævn besvarelse der kun delvist opfylder opgavekrav eller mangler dybde
+         - 02: Tilstrækkelig besvarelse der kun minimalt besvarer opgavekravene
+         - 00: Utilstrækkelig besvarelse der ikke besvarer væsentlige opgavekrav
+         - -3: Ingen reel besvarelse af opgavekravene
+      4. Vær opmærksom på at belønne:
+         - Særligt god analyse af det krævede materiale
+         - Selvstændig og velargumenteret brug af teori
+         - God kobling mellem teori og analyse
+         - Grundig behandling af alle opgavens dele
+      5. Giv en detaljeret begrundelse der relaterer til opgavekravene
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -97,7 +103,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke. Du er meget grundig i din akademiske vurdering og giver realistiske karakterer på 7-trinsskalaen baseret på opgavens akademiske kvaliteter.' 
+            content: 'Du er en erfaren dansklærer der vurderer opgaver. Vær særligt opmærksom på at belønne opgaver der grundigt besvarer alle krav fra opgaveformuleringen. En opgave der viser fremragende forståelse og analyse fortjener topkarakter. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],

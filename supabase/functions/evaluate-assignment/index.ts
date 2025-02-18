@@ -50,48 +50,57 @@ serve(async (req) => {
     }
 
     const prompt = `
-      Du er en erfaren dansklærer, der skal vurdere følgende opgavebesvarelse på den danske 7-trinsskala (-3, 00, 02, 4, 7, 10, 12).
+      Du er en erfaren lærer, der skal vurdere følgende opgavebesvarelse på den danske 7-trinsskala (-3, 00, 02, 4, 7, 10, 12).
 
       ${sanitizedInstructionsText ? `OPGAVEBESKRIVELSE:\n${sanitizedInstructionsText}\n\n` : ''}
       
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
       VIGTIGE RETNINGSLINJER FOR VURDERING:
-      1. Vurder primært hvor godt opgavebesvarelsen opfylder kravene fra opgaveformuleringen
-      2. Vurder besvarelsen ud fra disse kriterier i prioriteret rækkefølge:
+      1. Vurder primært hvor godt opgavebesvarelsen opfylder kravene fra opgaveformuleringen ved at:
+         - Kontrollere at ALLE delspørgsmål er besvaret grundigt
+         - Vurdere dybden og kvaliteten af analysen for hvert delspørgsmål
+         - Se på sammenhængen mellem delkonklusioner og hovedkonklusion
+      
+      2. Vurder den akademiske kvalitet ud fra:
          A. Primære kriterier (vægter tungest):
-            - Grundig og udtømmende besvarelse af ALLE delspørgsmål fra opgaveformuleringen
-            - Fremragende analyse og fortolkning med selvstændig brug af relevante fagbegreber
-            - Evne til at kombinere teori og analyse på en overbevisende måde
-            - Velstruktureret argumentation med klar rød tråd
+            - Dybdegående analyse med relevant brug af fagbegreber og modeller
+            - Selvstændig anvendelse af teori på case/empiri
+            - Velargumenterede konklusioner baseret på analysen
+            - Kritisk vurdering og diskussion af resultater
          B. Sekundære kriterier:
-            - Korrekt anvendelse af kilder og dokumentation
-            - Akademisk sprog og formidling
-            - God struktur med indholdsfortegnelse og logisk opbygning
+            - Struktur og rød tråd
+            - Kildeanvendelse og dokumentation
+            - Sprog og formidling
+      
       3. Karaktergivning skal følge disse retningslinjer:
-         - 12: Gives for den FREMRAGENDE præstation der:
-           * Besvarer ALLE opgavekrav udtømmende og selvstændigt
-           * Viser excellent analyse og brug af fagbegreber
-           * Har særdeles velargumenterede pointer
-           * Demonstrerer fremragende evne til at kombinere teori og analyse
-           * Har fejlfri dokumentation og akademisk sprog
-         - 10: En fortrinlig besvarelse med få uvæsentlige mangler
-         - 7: En god besvarelse med nogle mangler
-         - 4: En jævn besvarelse med flere væsentlige mangler
-         - 02: En tilstrækkelig besvarelse med store mangler
-         - 00: En utilstrækkelig besvarelse
-         - -3: En helt uacceptabel præstation
-      4. Vær særligt opmærksom på at belønne:
-         - Selvstændig og dyb analyse
-         - Evne til at kombinere teori og analyse på sofistikeret vis
-         - Velunderbygget argumentation
+         - 12: Gives for den FREMRAGENDE præstation hvor:
+           * Alle opgavekrav er udtømmende besvaret
+           * Analysen er særdeles dybtgående og selvstændig
+           * Teorier og modeller anvendes præcist og med stor indsigt
+           * Argumentationen er overbevisende og velunderbygget
+           * Konklusioner følger logisk af analyserne
+           * Der vises kritisk sans og selvstændig vurdering
+         - 10: Fortrinlig besvarelse der opfylder næsten alle krav til 12
+         - 7: God besvarelse med flere gode elementer men ikke alle dele er lige vellykkede
+         - 4: Jævn besvarelse med flere mangler i analyse og argumentation
+         - 02: Tilstrækkelig besvarelse der kun minimalt besvarer opgavekravene
+         - 00: Utilstrækkelig besvarelse
+         - -3: Helt uacceptabel præstation
+      
+      4. Særligt positive elementer der skal belønnes:
          - Grundig behandling af alle opgavens dele
-         - God struktur og rød tråd gennem opgaven
-      5. For at få topkarakteren 12 skal besvarelsen:
-         - Vise fremragende forståelse af alle aspekter af opgaven
-         - Have særdeles velargumenterede pointer
-         - Demonstrere selvstændig analyse og brug af relevante fagbegreber
-         - Have en klar rød tråd og logisk struktur
+         - Selvstændig analyse der går ud over det åbenlyse
+         - God brug af relevant teori og modeller
+         - Velargumenterede konklusioner
+         - God struktur og rød tråd
+         - Relevant brug af kilder og data
+      
+      5. Ved erhvervsøkonomiske opgaver, læg særlig vægt på:
+         - Anvendelse af relevante analysemodeller (PEST, Five Forces etc.)
+         - Kobling mellem teori og praktisk analyse
+         - Dybde i markedsanalysen
+         - Velunderbyggede strategiske anbefalinger
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -113,7 +122,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Fremragende besvarelser der viser dyb forståelse, selvstændig analyse og grundig behandling af alle opgavekrav fortjener topkarakteren 12. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
+            content: 'Du er en erfaren lærer der vurderer opgaver. Fremragende besvarelser der viser dyb analyse, selvstændig brug af teori og modeller, samt grundig behandling af alle opgavekrav fortjener topkarakterer. Vær særlig opmærksom på at belønne god brug af analysemodeller og velunderbyggede konklusioner i erhvervsøkonomiske opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.' 
           },
           { role: 'user', content: prompt }
         ],

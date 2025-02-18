@@ -57,19 +57,25 @@ serve(async (req) => {
       
       OPGAVEBESVARELSE:\n${sanitizedAssignmentText}
       
-      VIGTIGE RETNINGSLINJER:
+      VIGTIGE RETNINGSLINJER FOR VURDERING:
       1. Bedøm KUN opgavebesvarelsen - ikke opgavebeskrivelsen
-      2. Hvis besvarelsen er meget kort, ukomplet eller irrelevant i forhold til opgavebeskrivelsen, skal du give en lav karakter (-3, 00 eller 02)
-      3. Vær kritisk og realistisk i din bedømmelse
-      4. Giv en detaljeret begrundelse for karakteren
-      5. Bemærk særligt:
-         - -3: Gives for den ringe præstation der ikke demonstrerer acceptabel grad af målopfyldelse
-         - 00: Gives for den utilstrækkelige præstation der ikke demonstrerer acceptabel grad af målopfyldelse
-         - 02: Gives for den tilstrækkelige præstation der demonstrerer den minimalt acceptable grad af målopfyldelse
-         - 4: Gives for den jævne præstation der demonstrerer en mindre grad af opfyldelse af fagets mål
-         - 7: Gives for den gode præstation der demonstrerer opfyldelse af fagets mål med en del mangler
-         - 10: Gives for den fortrinlige præstation der demonstrerer omfattende opfyldelse af fagets mål med nogle få uvæsentlige mangler
-         - 12: Gives for den fremragende præstation der demonstrerer udtømmende opfyldelse af fagets mål uden mangler
+      2. Vurder besvarelsen ud fra følgende akademiske kriterier:
+         - Struktur og sammenhæng i besvarelsen
+         - Dybde i analyse og argumentation
+         - Brug af faglige begreber og teori
+         - Korrekt kildehenvisning og dokumentation
+         - Sprog og formidling
+         - Besvarelse af alle opgavens delspørgsmål
+      3. Vær konsekvent i karaktergivningen og følg disse retningslinjer:
+         - 12: Fremragende besvarelse med selvstændig analyse, velargumenteret, akademisk sprog, korrekte henvisninger
+         - 10: Fortrinlig besvarelse med god analyse, få mangler, akademisk sprog, korrekte henvisninger
+         - 7: God besvarelse med anályse og argumentation, men med nogle mangler
+         - 4: Jævn besvarelse med simple analyser og basic argumentation
+         - 02: Tilstrækkelig besvarelse med betydelige mangler
+         - 00: Utilstrækkelig besvarelse med store mangler
+         - -3: Helt utilstrækkelig besvarelse eller ingen relevant besvarelse
+      4. For korte eller irrelevante besvarelser skal have lave karakterer (-3, 00, 02)
+      5. Giv en detaljeret begrundelse baseret på de akademiske kriterier
       
       VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
       {
@@ -91,12 +97,12 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke. Du er meget kritisk og giver realistiske karakterer på 7-trinsskalaen.' 
+            content: 'Du er en erfaren dansklærer der vurderer opgaver. Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke. Du er meget grundig i din akademiske vurdering og giver realistiske karakterer på 7-trinsskalaen baseret på opgavens akademiske kvaliteter.' 
           },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
-        max_tokens: 1000, // Limit response length
+        max_tokens: 1000,
       }),
     })
 

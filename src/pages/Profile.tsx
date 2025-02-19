@@ -44,6 +44,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from("evaluations")
         .select("*")
+        .eq('user_id', user?.id) // Only fetch user's own evaluations
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -79,15 +80,18 @@ export default function Profile() {
         .from("evaluations")
         .update({ 
           actual_grade: actualGrade,
-          accuracy_score: accuracyScore
+          accuracy_score: accuracyScore,
+          user_id: user?.id // Ensure user_id is set
         })
-        .eq("id", evaluationId);
+        .eq("id", evaluationId)
+        .select();
 
       if (error) {
         console.error("Error updating grade:", error);
         throw error;
       }
 
+      // Update local state immediately
       setEvaluations(prevEvaluations => 
         prevEvaluations.map(evaluation => 
           evaluation.id === evaluationId
@@ -100,8 +104,6 @@ export default function Profile() {
         title: "Karakter opdateret",
         description: "Din faktiske karakter er blevet gemt.",
       });
-      
-      fetchEvaluations();
     } catch (error) {
       console.error("Error in handleActualGradeUpdate:", error);
       toast({

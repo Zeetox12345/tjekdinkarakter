@@ -1,3 +1,4 @@
+
 import { Upload, AlertCircle, Star, FileText, LockIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { evaluateAssignment } from "@/functions/evaluate-assignment";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
+import { AccuracyStats } from "@/components/AccuracyStats";
 import {
   Dialog,
   DialogContent,
@@ -157,6 +159,10 @@ const Index = () => {
               * Tilføj opgavebeskrivelsen for en mere præcis vurdering
             </p>
           </motion.div>
+        </section>
+
+        <section className="mb-12">
+          <AccuracyStats />
         </section>
 
         <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>

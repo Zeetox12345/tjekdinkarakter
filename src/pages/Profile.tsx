@@ -54,6 +54,7 @@ export default function Profile() {
 
   const fetchEvaluations = async () => {
     try {
+      console.log("Fetching evaluations...");
       const { data, error } = await supabase
         .from("evaluations")
         .select("*")
@@ -61,8 +62,10 @@ export default function Profile() {
 
       if (error) throw error;
 
+      console.log("Fetched evaluations:", data);
       setEvaluations(data || []);
     } catch (error) {
+      console.error("Error fetching evaluations:", error);
       toast({
         title: "Fejl ved hentning af evalueringer",
         description: "Der opstod en fejl. Prøv igen senere.",
@@ -88,10 +91,16 @@ export default function Profile() {
 
   const handleActualGradeUpdate = async (evaluationId: string, actualGrade: string) => {
     try {
-      const accuracyScore = calculateAccuracy(
-        evaluations.find(e => e.id === evaluationId)?.grade || "0",
-        actualGrade
-      );
+      console.log("Updating actual grade:", evaluationId, actualGrade);
+      
+      const evaluation = evaluations.find(e => e.id === evaluationId);
+      if (!evaluation) {
+        console.error("Evaluation not found:", evaluationId);
+        return;
+      }
+
+      const accuracyScore = calculateAccuracy(evaluation.grade, actualGrade);
+      console.log("Calculated accuracy score:", accuracyScore);
 
       const { error } = await supabase
         .from("evaluations")
@@ -101,7 +110,10 @@ export default function Profile() {
         })
         .eq("id", evaluationId);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating grade:", error);
+        throw error;
+      }
 
       setEvaluations(prevEvaluations => 
         prevEvaluations.map(evaluation => 
@@ -115,7 +127,11 @@ export default function Profile() {
         title: "Karakter opdateret",
         description: "Din faktiske karakter er blevet gemt.",
       });
+      
+      // Trigger a re-fetch to ensure our data is up to date
+      fetchEvaluations();
     } catch (error) {
+      console.error("Error in handleActualGradeUpdate:", error);
       toast({
         title: "Fejl ved opdatering",
         description: "Der opstod en fejl. Prøv igen senere.",

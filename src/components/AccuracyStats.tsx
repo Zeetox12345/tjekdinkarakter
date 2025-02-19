@@ -31,8 +31,7 @@ export function AccuracyStats() {
   const fetchAccuracyStats = async () => {
     const { data: evaluations, error } = await supabase
       .from("evaluations")
-      .select("accuracy_score, actual_grade")
-      .not("actual_grade", "is", null)
+      .select("accuracy_score")
       .not("accuracy_score", "is", null);
 
     if (error) {
@@ -40,21 +39,9 @@ export function AccuracyStats() {
       return;
     }
 
-    console.log("Fetched evaluations for stats:", evaluations);
-
-    if (!evaluations || evaluations.length === 0) {
-      console.log("No evaluations with accuracy scores found");
-      return;
-    }
-
-    const scores = evaluations
-      .filter(e => e.accuracy_score !== null)
-      .map(e => e.accuracy_score as number);
+    const scores = evaluations.map(e => e.accuracy_score as number);
     
-    if (scores.length === 0) {
-      console.log("No valid accuracy scores found");
-      return;
-    }
+    if (scores.length === 0) return;
 
     const average = scores.reduce((a, b) => a + b, 0) / scores.length;
     
@@ -73,8 +60,6 @@ export function AccuracyStats() {
       else if (percentage >= 50) distribution[2].count++;
       else distribution[3].count++;
     });
-
-    console.log("Calculated distribution:", distribution);
 
     setStats({
       total_evaluations: scores.length,

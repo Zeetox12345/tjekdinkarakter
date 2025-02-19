@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -6,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { User, ArrowLeft, Trash2 } from "lucide-react";
+import { User, ArrowLeft, Trash2, FileText, File } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,6 +19,8 @@ interface Evaluation {
   id: string;
   created_at: string;
   assignment_text: string;
+  file_name?: string;
+  file_url?: string;
   grade: string;
 }
 
@@ -101,6 +102,29 @@ export default function Profile() {
     return text.substring(0, maxLength) + "...";
   };
 
+  const renderAssignmentContent = (evaluation: Evaluation) => {
+    if (evaluation.file_url && evaluation.file_name) {
+      return (
+        <div className="flex items-center space-x-2">
+          <File className="h-4 w-4" />
+          <a 
+            href={evaluation.file_url}
+            download={evaluation.file_name}
+            className="text-primary hover:underline"
+          >
+            {evaluation.file_name}
+          </a>
+        </div>
+      );
+    }
+    return (
+      <div className="flex items-center space-x-2">
+        <FileText className="h-4 w-4" />
+        <span>{truncateText(evaluation.assignment_text)}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -158,7 +182,7 @@ export default function Profile() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Opgavetekst</TableHead>
+                    <TableHead>Opgave</TableHead>
                     <TableHead className="w-24">Karakter</TableHead>
                     <TableHead className="w-48">Dato</TableHead>
                     <TableHead className="w-24">Handling</TableHead>
@@ -168,7 +192,7 @@ export default function Profile() {
                   {evaluations.map((evaluation) => (
                     <TableRow key={evaluation.id}>
                       <TableCell className="font-medium">
-                        {truncateText(evaluation.assignment_text)}
+                        {renderAssignmentContent(evaluation)}
                       </TableCell>
                       <TableCell>{evaluation.grade}</TableCell>
                       <TableCell>{formatDate(evaluation.created_at)}</TableCell>

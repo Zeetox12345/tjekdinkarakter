@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User } from "@supabase/supabase-js";
+import { User as UserIcon } from "lucide-react";
 
 export function MainNav({ user }: { user: User | null }) {
   const { toast } = useToast();
@@ -44,11 +45,15 @@ export function MainNav({ user }: { user: User | null }) {
           {user ? (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost">
+                <Button variant="ghost" className="gap-2">
+                  <UserIcon className="h-4 w-4" />
                   {user.email}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  Min profil
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleSignOut}>
                   Log ud
                 </DropdownMenuItem>

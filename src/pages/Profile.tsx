@@ -5,23 +5,11 @@ import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { User, ArrowLeft, Trash2, FileText, File, Edit2 } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft } from "lucide-react";
+import { UserHeader } from "@/components/profile/UserHeader";
+import { EvaluationList } from "@/components/profile/EvaluationList";
+import { calculateAccuracy } from "@/utils/evaluation-utils";
 
 interface Evaluation {
   id: string;
@@ -33,8 +21,6 @@ interface Evaluation {
   actual_grade?: string;
   accuracy_score?: number;
 }
-
-const GRADES = ["12", "10", "7", "4", "02", "00", "-3"];
 
 export default function Profile() {
   const { user } = useAuth();
@@ -76,19 +62,6 @@ export default function Profile() {
     }
   };
 
-  const calculateAccuracy = (predicted: string, actual: string): number => {
-    const grades = ["12", "10", "7", "4", "02", "00", "-3"];
-    const predictedIndex = grades.indexOf(predicted);
-    const actualIndex = grades.indexOf(actual);
-    
-    // Calculate normalized distance (0 = perfect match, 1 = furthest apart)
-    const maxDistance = grades.length - 1;
-    const distance = Math.abs(predictedIndex - actualIndex);
-    const accuracy = 1 - (distance / maxDistance);
-    
-    return Number(accuracy.toFixed(2));
-  };
-
   const handleActualGradeUpdate = async (evaluationId: string, actualGrade: string) => {
     try {
       console.log("Updating actual grade:", evaluationId, actualGrade);
@@ -128,7 +101,6 @@ export default function Profile() {
         description: "Din faktiske karakter er blevet gemt.",
       });
       
-      // Trigger a re-fetch to ensure our data is up to date
       fetchEvaluations();
     } catch (error) {
       console.error("Error in handleActualGradeUpdate:", error);
@@ -166,44 +138,6 @@ export default function Profile() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("da-DK", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const truncateText = (text: string, maxLength: number = 100) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
-
-  const renderAssignmentContent = (evaluation: Evaluation) => {
-    if (evaluation.file_url && evaluation.file_name) {
-      return (
-        <div className="flex items-center space-x-2">
-          <File className="h-4 w-4" />
-          <a 
-            href={evaluation.file_url}
-            download={evaluation.file_name}
-            className="text-primary hover:underline"
-          >
-            {evaluation.file_name}
-          </a>
-        </div>
-      );
-    }
-    return (
-      <div className="flex items-center space-x-2">
-        <FileText className="h-4 w-4" />
-        <span>{truncateText(evaluation.assignment_text)}</span>
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -217,21 +151,12 @@ export default function Profile() {
             Tilbage til forsiden
           </Button>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center space-x-4">
-                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold">{user?.email}</h1>
-                  <p className="text-sm text-gray-500">
-                    Medlem siden {user && formatDate(user.created_at)}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
+          {user && (
+            <UserHeader 
+              email={user.email || ""} 
+              createdAt={user.created_at} 
+            />
+          )}
         </div>
 
         <div className="space-y-6">
@@ -258,54 +183,11 @@ export default function Profile() {
             </Card>
           ) : (
             <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Opgave</TableHead>
-                    <TableHead className="w-24">Estimeret</TableHead>
-                    <TableHead className="w-24">Faktisk</TableHead>
-                    <TableHead className="w-48">Dato</TableHead>
-                    <TableHead className="w-24">Handling</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {evaluations.map((evaluation) => (
-                    <TableRow key={evaluation.id}>
-                      <TableCell className="font-medium">
-                        {renderAssignmentContent(evaluation)}
-                      </TableCell>
-                      <TableCell>{evaluation.grade}</TableCell>
-                      <TableCell>
-                        <Select
-                          value={evaluation.actual_grade || ""}
-                          onValueChange={(value) => handleActualGradeUpdate(evaluation.id, value)}
-                        >
-                          <SelectTrigger className="w-20">
-                            <SelectValue placeholder="-" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {GRADES.map((grade) => (
-                              <SelectItem key={grade} value={grade}>
-                                {grade}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>{formatDate(evaluation.created_at)}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(evaluation.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <EvaluationList 
+                evaluations={evaluations}
+                onDelete={handleDelete}
+                onActualGradeUpdate={handleActualGradeUpdate}
+              />
             </Card>
           )}
         </div>

@@ -11,6 +11,8 @@ export type Database = {
     Tables: {
       evaluations: {
         Row: {
+          accuracy_score: number | null
+          actual_grade: string | null
           assignment_text: string
           created_at: string
           grade: string
@@ -22,6 +24,8 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          accuracy_score?: number | null
+          actual_grade?: string | null
           assignment_text: string
           created_at?: string
           grade: string
@@ -33,6 +37,8 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          accuracy_score?: number | null
+          actual_grade?: string | null
           assignment_text?: string
           created_at?: string
           grade?: string

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -5,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { User, ArrowLeft, Trash2, FileText, File } from "lucide-react";
+import { User, ArrowLeft, Trash2, FileText, File, Edit2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -14,6 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Evaluation {
   id: string;
@@ -22,7 +30,11 @@ interface Evaluation {
   file_name?: string;
   file_url?: string;
   grade: string;
+  actual_grade?: string;
+  accuracy_score?: number;
 }
+
+const GRADES = ["12", "10", "7", "4", "02", "00", "-3"];
 
 export default function Profile() {
   const { user } = useAuth();
@@ -58,6 +70,57 @@ export default function Profile() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const calculateAccuracy = (predicted: string, actual: string): number => {
+    const grades = ["12", "10", "7", "4", "02", "00", "-3"];
+    const predictedIndex = grades.indexOf(predicted);
+    const actualIndex = grades.indexOf(actual);
+    
+    // Calculate normalized distance (0 = perfect match, 1 = furthest apart)
+    const maxDistance = grades.length - 1;
+    const distance = Math.abs(predictedIndex - actualIndex);
+    const accuracy = 1 - (distance / maxDistance);
+    
+    return Number(accuracy.toFixed(2));
+  };
+
+  const handleActualGradeUpdate = async (evaluationId: string, actualGrade: string) => {
+    try {
+      const accuracyScore = calculateAccuracy(
+        evaluations.find(e => e.id === evaluationId)?.grade || "0",
+        actualGrade
+      );
+
+      const { error } = await supabase
+        .from("evaluations")
+        .update({ 
+          actual_grade: actualGrade,
+          accuracy_score: accuracyScore
+        })
+        .eq("id", evaluationId);
+
+      if (error) throw error;
+
+      setEvaluations(prevEvaluations => 
+        prevEvaluations.map(evaluation => 
+          evaluation.id === evaluationId
+            ? { ...evaluation, actual_grade: actualGrade, accuracy_score: accuracyScore }
+            : evaluation
+        )
+      );
+
+      toast({
+        title: "Karakter opdateret",
+        description: "Din faktiske karakter er blevet gemt.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fejl ved opdatering",
+        description: "Der opstod en fejl. Prøv igen senere.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -183,7 +246,8 @@ export default function Profile() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Opgave</TableHead>
-                    <TableHead className="w-24">Karakter</TableHead>
+                    <TableHead className="w-24">Estimeret</TableHead>
+                    <TableHead className="w-24">Faktisk</TableHead>
                     <TableHead className="w-48">Dato</TableHead>
                     <TableHead className="w-24">Handling</TableHead>
                   </TableRow>
@@ -195,6 +259,23 @@ export default function Profile() {
                         {renderAssignmentContent(evaluation)}
                       </TableCell>
                       <TableCell>{evaluation.grade}</TableCell>
+                      <TableCell>
+                        <Select
+                          value={evaluation.actual_grade || ""}
+                          onValueChange={(value) => handleActualGradeUpdate(evaluation.id, value)}
+                        >
+                          <SelectTrigger className="w-20">
+                            <SelectValue placeholder="-" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {GRADES.map((grade) => (
+                              <SelectItem key={grade} value={grade}>
+                                {grade}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
                       <TableCell>{formatDate(evaluation.created_at)}</TableCell>
                       <TableCell>
                         <Button

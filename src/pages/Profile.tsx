@@ -69,7 +69,10 @@ export default function Profile() {
 
       if (error) throw error;
 
-      setEvaluations((prev) => prev.filter((eval) => eval.id !== id));
+      setEvaluations((prevEvaluations) => 
+        prevEvaluations.filter((evaluation) => evaluation.id !== id)
+      );
+      
       toast({
         title: "Evaluering slettet",
         description: "Din evaluering er blevet slettet.",

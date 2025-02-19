@@ -43,6 +43,26 @@ const Index = () => {
     }
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent, type: 'instructions' | 'assignment') => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (type === 'instructions') {
+        setInstructionsFile(file);
+      } else {
+        setAssignmentFile(file);
+      }
+    }
+  };
+
   const handleEvaluateClick = () => {
     if (!user) {
       setShowAuthDialog(true);
@@ -212,7 +232,13 @@ const Index = () => {
                 <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload opgavebeskrivelsen</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
+                      ${instructionsFile ? 'border-primary' : 'border-gray-300'}
+                      hover:border-primary cursor-pointer`}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, 'instructions')}
+                  >
                     <input
                       type="file"
                       accept=".doc,.docx,.pdf"
@@ -226,7 +252,7 @@ const Index = () => {
                     >
                       <FileText className="w-12 h-12 text-primary mb-2" />
                       <span className="text-sm text-gray-600">
-                        Klik for at uploade eller træk filen hertil (.doc, .docx, .pdf)
+                        Træk filen hertil eller klik for at uploade (.doc, .docx, .pdf)
                       </span>
                       {instructionsFile && (
                         <span className="mt-2 text-sm text-primary">{instructionsFile.name}</span>
@@ -251,7 +277,13 @@ const Index = () => {
                 <h3 className="text-xl font-semibold text-gray-900">Din Opgave</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload din opgave</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
+                      ${assignmentFile ? 'border-primary' : 'border-gray-300'}
+                      hover:border-primary cursor-pointer`}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, 'assignment')}
+                  >
                     <input
                       type="file"
                       accept=".doc,.docx,.pdf"
@@ -265,7 +297,7 @@ const Index = () => {
                     >
                       <FileText className="w-12 h-12 text-primary mb-2" />
                       <span className="text-sm text-gray-600">
-                        Klik for at uploade eller træk filen hertil (.doc, .docx, .pdf)
+                        Træk filen hertil eller klik for at uploade (.doc, .docx, .pdf)
                       </span>
                       {assignmentFile && (
                         <span className="mt-2 text-sm text-primary">{assignmentFile.name}</span>

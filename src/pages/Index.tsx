@@ -120,16 +120,12 @@ const Index = () => {
               Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
             </p>
           </motion.div>
-        </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <section className="text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-3xl mx-auto"
+            className="max-w-3xl mx-auto mt-8"
           >
             <div className="flex items-center justify-center mb-8">
               <span className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
@@ -137,15 +133,7 @@ const Index = () => {
               </span>
             </div>
             
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-              Din Superhuman Karakterprediktor
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Upload din opgave og få øjeblikkelig feedback fra vores avancerede AI. 
-              Præcis. Hurtig. Pålidelig.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+            <div className="flex justify-center mb-8">
               <Button 
                 size="lg" 
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
@@ -155,18 +143,9 @@ const Index = () => {
                 <Zap className="mr-2 h-5 w-5" />
                 {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="px-8 py-6 text-lg rounded-lg"
-                onClick={() => document.getElementById('assignment-upload')?.click()}
-              >
-                <Upload className="mr-2 h-5 w-5" />
-                Upload opgave
-              </Button>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
               <div className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-primary" />
                 <span className="text-sm text-gray-600">AI-drevet analyse</span>
@@ -181,8 +160,10 @@ const Index = () => {
               </div>
             </div>
           </motion.div>
-        </section>
+        </div>
+      </header>
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <section className="mb-12">
           <AccuracyStats />
         </section>
@@ -300,7 +281,7 @@ const Index = () => {
             </div>
 
             <div className="mt-8 text-center pt-6 border-t border-gray-200">
-              {/* Note: Removed the text from here as it's now below the button */}
+              
             </div>
           </Card>
         </div>

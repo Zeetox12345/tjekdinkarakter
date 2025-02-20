@@ -1,4 +1,3 @@
-
 import { Upload, AlertCircle, Star, FileText, LockIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,16 +11,11 @@ import { evaluateAssignment } from "@/functions/evaluate-assignment";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { AccuracyStats } from "@/components/AccuracyStats";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 const Index = () => {
-  const { user } = useAuth();
+  const {
+    user
+  } = useAuth();
   const navigate = useNavigate();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [assignmentText, setAssignmentText] = useState("");
@@ -31,29 +25,26 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [evaluation, setEvaluation] = useState<any>(null);
   const [progress, setProgress] = useState(0);
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleAssignmentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setAssignmentFile(e.target.files[0]);
     }
   };
-
   const handleInstructionsFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setInstructionsFile(e.target.files[0]);
     }
   };
-
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
   const handleDrop = (e: React.DragEvent, type: 'instructions' | 'assignment') => {
     e.preventDefault();
     e.stopPropagation();
-
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const file = files[0];
@@ -64,7 +55,6 @@ const Index = () => {
       }
     }
   };
-
   const handleEvaluateClick = () => {
     if (!user) {
       setShowAuthDialog(true);
@@ -72,22 +62,19 @@ const Index = () => {
     }
     handleEvaluate();
   };
-
   const handleEvaluate = async () => {
     if (!assignmentText && !assignmentFile) {
       toast({
         title: "Ingen opgave at vurdere",
         description: "Du skal enten uploade en fil eller indtaste opgavetekst",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     setIsLoading(true);
     setProgress(0);
-    
     const progressInterval = setInterval(() => {
-      setProgress((prev) => {
+      setProgress(prev => {
         if (prev >= 90) {
           clearInterval(progressInterval);
           return prev;
@@ -95,37 +82,28 @@ const Index = () => {
         return prev + 10;
       });
     }, 1000);
-
     try {
-      const result = await evaluateAssignment(
-        assignmentFile,
-        assignmentText,
-        instructionsFile,
-        instructionsText
-      );
-      
+      const result = await evaluateAssignment(assignmentFile, assignmentText, instructionsFile, instructionsText);
       setEvaluation(result);
       setProgress(100);
     } catch (error) {
       toast({
         title: "Fejl ved vurdering",
         description: "Der opstod en fejl under vurderingen af din opgave. Prøv igen senere.",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       clearInterval(progressInterval);
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+  return <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="w-full py-6 px-4 sm:px-6 lg:px-8 border-b border-gray-100">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center">
             TjekDinKarakter.dk
           </h1>
-          <p className="mt-2 text-lg text-gray-600">
+          <p className="mt-2 text-lg text-gray-600 text-center">
             Få en hurtig, AI-drevet vurdering af din opgave
           </p>
         </div>
@@ -133,11 +111,15 @@ const Index = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <section className="text-center mb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.5
+        }}>
             <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-4">
               Upload din opgave og få øjeblikkelig feedback
             </h2>
@@ -146,12 +128,7 @@ const Index = () => {
               så du kan forbedre din opgave før endelig aflevering.
             </p>
             
-            <Button
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-4"
-              onClick={handleEvaluateClick}
-              disabled={isLoading}
-            >
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all mb-4" onClick={handleEvaluateClick} disabled={isLoading}>
               <Upload className="mr-2 h-5 w-5" />
               {isLoading ? "Vurderer..." : "Bedøm opgave"}
             </Button>
@@ -173,12 +150,15 @@ const Index = () => {
                 For at få din opgave vurderet skal du oprette en konto eller logge ind.
               </DialogDescription>
             </DialogHeader>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col items-center space-y-4 pt-4"
-            >
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.3
+          }} className="flex flex-col items-center space-y-4 pt-4">
               <div className="rounded-full bg-primary/10 p-4">
                 <LockIcon className="h-6 w-6 text-primary" />
               </div>
@@ -189,23 +169,16 @@ const Index = () => {
                 <br />• Følge din progression over tid
               </p>
               <div className="flex gap-4 w-full">
-                <Button 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={() => {
-                    setShowAuthDialog(false);
-                    navigate("/auth");
-                  }}
-                >
+                <Button variant="outline" className="flex-1" onClick={() => {
+                setShowAuthDialog(false);
+                navigate("/auth");
+              }}>
                   Log ind
                 </Button>
-                <Button 
-                  className="flex-1"
-                  onClick={() => {
-                    setShowAuthDialog(false);
-                    navigate("/auth");
-                  }}
-                >
+                <Button className="flex-1" onClick={() => {
+                setShowAuthDialog(false);
+                navigate("/auth");
+              }}>
                   Opret konto
                 </Button>
               </div>
@@ -213,8 +186,7 @@ const Index = () => {
           </DialogContent>
         </Dialog>
 
-        {isLoading && (
-          <div className="max-w-xl mx-auto mb-8">
+        {isLoading && <div className="max-w-xl mx-auto mb-8">
             <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Vurderer din opgave...</h3>
               <Progress value={progress} className="mb-2" />
@@ -222,14 +194,11 @@ const Index = () => {
                 Dette kan tage et par minutter
               </p>
             </Card>
-          </div>
-        )}
+          </div>}
 
-        {evaluation && !isLoading && (
-          <div className="max-w-4xl mx-auto mb-8">
+        {evaluation && !isLoading && <div className="max-w-4xl mx-auto mb-8">
             <EvaluationResult evaluation={evaluation} />
-          </div>
-        )}
+          </div>}
 
         <div className="max-w-7xl mx-auto mb-16">
           <Card className="p-6">
@@ -238,31 +207,16 @@ const Index = () => {
                 <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload opgavebeskrivelsen</label>
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
+                  <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
                       ${instructionsFile ? 'border-primary' : 'border-gray-300'}
-                      hover:border-primary cursor-pointer`}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, 'instructions')}
-                  >
-                    <input
-                      type="file"
-                      accept=".doc,.docx,.pdf"
-                      onChange={handleInstructionsFileChange}
-                      className="hidden"
-                      id="instructions-upload"
-                    />
-                    <label
-                      htmlFor="instructions-upload"
-                      className="cursor-pointer flex flex-col items-center"
-                    >
+                      hover:border-primary cursor-pointer`} onDragOver={handleDragOver} onDrop={e => handleDrop(e, 'instructions')}>
+                    <input type="file" accept=".doc,.docx,.pdf" onChange={handleInstructionsFileChange} className="hidden" id="instructions-upload" />
+                    <label htmlFor="instructions-upload" className="cursor-pointer flex flex-col items-center">
                       <FileText className="w-12 h-12 text-primary mb-2" />
                       <span className="text-sm text-gray-600">
                         Træk filen hertil eller klik for at uploade (.doc, .docx, .pdf)
                       </span>
-                      {instructionsFile && (
-                        <span className="mt-2 text-sm text-primary">{instructionsFile.name}</span>
-                      )}
+                      {instructionsFile && <span className="mt-2 text-sm text-primary">{instructionsFile.name}</span>}
                     </label>
                   </div>
                 </div>
@@ -270,12 +224,7 @@ const Index = () => {
                   <label className="text-sm font-medium text-gray-700">
                     Eller indsæt opgavebeskrivelsen direkte
                   </label>
-                  <Textarea
-                    placeholder="Indsæt opgavebeskrivelsen her..."
-                    value={instructionsText}
-                    onChange={(e) => setInstructionsText(e.target.value)}
-                    className="min-h-[400px]"
-                  />
+                  <Textarea placeholder="Indsæt opgavebeskrivelsen her..." value={instructionsText} onChange={e => setInstructionsText(e.target.value)} className="min-h-[400px]" />
                 </div>
               </div>
 
@@ -283,31 +232,16 @@ const Index = () => {
                 <h3 className="text-xl font-semibold text-gray-900">Din Opgave</h3>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">Upload din opgave</label>
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
+                  <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors
                       ${assignmentFile ? 'border-primary' : 'border-gray-300'}
-                      hover:border-primary cursor-pointer`}
-                    onDragOver={handleDragOver}
-                    onDrop={(e) => handleDrop(e, 'assignment')}
-                  >
-                    <input
-                      type="file"
-                      accept=".doc,.docx,.pdf"
-                      onChange={handleAssignmentFileChange}
-                      className="hidden"
-                      id="assignment-upload"
-                    />
-                    <label
-                      htmlFor="assignment-upload"
-                      className="cursor-pointer flex flex-col items-center"
-                    >
+                      hover:border-primary cursor-pointer`} onDragOver={handleDragOver} onDrop={e => handleDrop(e, 'assignment')}>
+                    <input type="file" accept=".doc,.docx,.pdf" onChange={handleAssignmentFileChange} className="hidden" id="assignment-upload" />
+                    <label htmlFor="assignment-upload" className="cursor-pointer flex flex-col items-center">
                       <FileText className="w-12 h-12 text-primary mb-2" />
                       <span className="text-sm text-gray-600">
                         Træk filen hertil eller klik for at uploade (.doc, .docx, .pdf)
                       </span>
-                      {assignmentFile && (
-                        <span className="mt-2 text-sm text-primary">{assignmentFile.name}</span>
-                      )}
+                      {assignmentFile && <span className="mt-2 text-sm text-primary">{assignmentFile.name}</span>}
                     </label>
                   </div>
                 </div>
@@ -315,12 +249,7 @@ const Index = () => {
                   <label className="text-sm font-medium text-gray-700">
                     Eller indsæt din opgavetekst direkte
                   </label>
-                  <Textarea
-                    placeholder="Indsæt din opgavetekst her..."
-                    value={assignmentText}
-                    onChange={(e) => setAssignmentText(e.target.value)}
-                    className="min-h-[400px]"
-                  />
+                  <Textarea placeholder="Indsæt din opgavetekst her..." value={assignmentText} onChange={e => setAssignmentText(e.target.value)} className="min-h-[400px]" />
                 </div>
               </div>
             </div>
@@ -399,8 +328,6 @@ const Index = () => {
           </div>
         </footer>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;

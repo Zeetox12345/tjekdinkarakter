@@ -105,18 +105,18 @@ const Index = () => {
     }
   };
 
-  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
-      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 hero-gradient">
+  return <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 bg-white/95 text-primary inline-block px-6 py-2 rounded-lg shadow-lg backdrop-blur-sm">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
               Din AI-Drevne Karakterguide
             </h1>
-            <p className="mt-4 text-xl sm:text-2xl max-w-3xl mx-auto bg-primary/90 text-white px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm">
+            <p className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
               Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
             </p>
           </motion.div>
@@ -128,63 +128,36 @@ const Index = () => {
             className="max-w-3xl mx-auto mt-8"
           >
             <div className="flex items-center justify-center mb-8">
-              <motion.span 
-                className="px-6 py-3 bg-white/95 text-primary font-semibold rounded-full text-sm shadow-lg backdrop-blur-sm"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
+              <span className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
                 Brugt af over 10.000 studerende
-              </motion.span>
+              </span>
             </div>
             
             <div className="flex justify-center mb-8">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              <Button 
+                size="lg" 
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
+                onClick={handleEvaluateClick}
+                disabled={isLoading}
               >
-                <Button 
-                  size="lg" 
-                  className="btn-epic text-white px-8 py-6 text-lg rounded-lg pulse-glow"
-                  onClick={handleEvaluateClick}
-                  disabled={isLoading}
-                >
-                  <Zap className="mr-2 h-5 w-5" />
-                  {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
-                </Button>
-              </motion.div>
+                <Zap className="mr-2 h-5 w-5" />
+                {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
+              </Button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-              <motion.div 
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm p-4 rounded-lg"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Brain className="h-5 w-5 text-white animate-float" />
-                <span className="text-sm text-white">AI-drevet analyse</span>
-              </motion.div>
-              <motion.div 
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm p-4 rounded-lg"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Target className="h-5 w-5 text-white animate-float" />
-                <span className="text-sm text-white">98% nøjagtighed</span>
-              </motion.div>
-              <motion.div 
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm p-4 rounded-lg"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Zap className="h-5 w-5 text-white animate-float" />
-                <span className="text-sm text-white">Svar på sekunder</span>
-              </motion.div>
+              <div className="flex items-center gap-2">
+                <Brain className="h-5 w-5 text-primary" />
+                <span className="text-sm text-gray-600">AI-drevet analyse</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                <span className="text-sm text-gray-600">98% nøjagtighed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-primary" />
+                <span className="text-sm text-gray-600">Svar på sekunder</span>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -203,10 +176,15 @@ const Index = () => {
                 For at få din opgave vurderet skal du oprette en konto eller logge ind.
               </DialogDescription>
             </DialogHeader>
-            <motion.div initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col items-center space-y-4 pt-4">
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.3
+          }} className="flex flex-col items-center space-y-4 pt-4">
               <div className="rounded-full bg-primary/10 p-4">
                 <LockIcon className="h-6 w-6 text-primary" />
               </div>
@@ -218,15 +196,15 @@ const Index = () => {
               </p>
               <div className="flex gap-4 w-full">
                 <Button variant="outline" className="flex-1" onClick={() => {
-                  setShowAuthDialog(false);
-                  navigate("/auth");
-                }}>
+                setShowAuthDialog(false);
+                navigate("/auth");
+              }}>
                   Log ind
                 </Button>
-                <Button className="flex-1 btn-epic" onClick={() => {
-                  setShowAuthDialog(false);
-                  navigate("/auth");
-                }}>
+                <Button className="flex-1" onClick={() => {
+                setShowAuthDialog(false);
+                navigate("/auth");
+              }}>
                   Opret konto
                 </Button>
               </div>
@@ -235,7 +213,7 @@ const Index = () => {
         </Dialog>
 
         {isLoading && <div className="max-w-xl mx-auto mb-8">
-            <Card className="p-6 card-glow">
+            <Card className="p-6">
               <h3 className="text-lg font-semibold mb-4">Analyserer din opgave...</h3>
               <Progress value={progress} className="mb-2" />
               <p className="text-sm text-gray-600 text-center">
@@ -248,13 +226,8 @@ const Index = () => {
             <EvaluationResult evaluation={evaluation} />
           </div>}
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-7xl mx-auto mb-16"
-        >
-          <Card className="p-6 bg-white/50 backdrop-blur-sm card-glow">
+        <div className="max-w-7xl mx-auto mb-16">
+          <Card className="p-6 bg-white/50 backdrop-blur-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-gray-900">Opgavebeskrivelse</h3>
@@ -306,18 +279,21 @@ const Index = () => {
                 </div>
               </div>
             </div>
+
+            <div className="mt-8 text-center pt-6 border-t border-gray-200">
+              
+            </div>
           </Card>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            whileHover={{ scale: 1.05 }}
           >
-            <Card className="p-6 hover:shadow-lg transition-shadow h-full card-glow">
-              <Brain className="w-12 h-12 text-primary mb-4 animate-float" />
+            <Card className="p-6 hover:shadow-lg transition-shadow h-full">
+              <Brain className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-xl font-semibold mb-2">Avanceret AI-analyse</h3>
               <p className="text-gray-600">
                 Vores AI analyserer din opgave på sekunder og giver dig præcis feedback
@@ -329,10 +305,9 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            whileHover={{ scale: 1.05 }}
           >
-            <Card className="p-6 hover:shadow-lg transition-shadow h-full card-glow">
-              <Target className="w-12 h-12 text-primary mb-4 animate-float" />
+            <Card className="p-6 hover:shadow-lg transition-shadow h-full">
+              <Target className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-xl font-semibold mb-2">Præcis vurdering</h3>
               <p className="text-gray-600">
                 Få en detaljeret analyse af dine styrker og forbedringsmuligheder
@@ -344,10 +319,9 @@ const Index = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.8 }}
-            whileHover={{ scale: 1.05 }}
           >
-            <Card className="p-6 hover:shadow-lg transition-shadow h-full card-glow">
-              <Zap className="w-12 h-12 text-primary mb-4 animate-float" />
+            <Card className="p-6 hover:shadow-lg transition-shadow h-full">
+              <Zap className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-xl font-semibold mb-2">Lynhurtig feedback</h3>
               <p className="text-gray-600">
                 Ingen ventetid - få din karaktervurdering med det samme

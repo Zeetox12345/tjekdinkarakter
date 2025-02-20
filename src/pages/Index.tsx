@@ -27,7 +27,26 @@ const Index = () => {
   const [evaluation, setEvaluation] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [dailyUsage, setDailyUsage] = useState<number>(0);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const { toast } = useToast();
+
+  const headerTexts = [
+    "Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator",
+    "Optimer din opgave med præcis feedback fra vores avancerede AI-system",
+    "Få professionel bedømmelse af din opgave på få sekunder",
+    "Forbedr din akademiske præstation med detaljeret karakteranalyse",
+    "Få personlig vejledning til at løfte din karakter til næste niveau"
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTextIndex((prevIndex) => 
+        prevIndex === headerTexts.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 7000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -152,14 +171,20 @@ const Index = () => {
             >
               Din AI-Drevne Karakterguide
             </motion.h1>
-            <motion.p 
-              className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
-            </motion.p>
+            <div className="h-24 sm:h-20">
+              <AnimatePresence mode="wait">
+                <motion.p 
+                  key={currentTextIndex}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.5 }}
+                  className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
+                >
+                  {headerTexts[currentTextIndex]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
           </motion.div>
 
           <motion.div

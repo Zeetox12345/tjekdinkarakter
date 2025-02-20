@@ -113,10 +113,10 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4 bg-white/95 text-primary inline-block px-6 py-2 rounded-lg shadow-lg backdrop-blur-sm">
               Din AI-Drevne Karakterguide
             </h1>
-            <p className="mt-4 text-xl sm:text-2xl text-white/90 max-w-3xl mx-auto">
+            <p className="mt-4 text-xl sm:text-2xl max-w-3xl mx-auto bg-primary/90 text-white px-6 py-3 rounded-lg shadow-lg backdrop-blur-sm">
               Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
             </p>
           </motion.div>
@@ -129,7 +129,7 @@ const Index = () => {
           >
             <div className="flex items-center justify-center mb-8">
               <motion.span 
-                className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-medium"
+                className="px-6 py-3 bg-white/95 text-primary font-semibold rounded-full text-sm shadow-lg backdrop-blur-sm"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >

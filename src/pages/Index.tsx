@@ -155,23 +155,23 @@ const Index = () => {
   };
 
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
-      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 hero-gradient">
+      <header className="w-full py-8 px-4 sm:px-6 lg:px-8 hero-gradient">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-12"
+            className="mb-8"
           >
             <motion.h1 
-              className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-6"
+              className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-4"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
               Din AI-Drevne Karakterguide
             </motion.h1>
-            <div className="h-24 sm:h-20">
+            <div className="h-20">
               <AnimatePresence mode="wait">
                 <motion.p 
                   key={currentTextIndex}
@@ -179,7 +179,7 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ duration: 0.5 }}
-                  className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
+                  className="mt-2 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
                 >
                   {headerTexts[currentTextIndex]}
                 </motion.p>
@@ -194,31 +194,20 @@ const Index = () => {
             className="max-w-3xl mx-auto"
           >
             <motion.div 
-              className="flex items-center justify-center mb-8"
-              whileHover={{ scale: 1.05 }}
+              className="flex justify-center mb-8"
+              whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <span className="px-6 py-3 bg-primary/10 text-primary rounded-full text-sm font-medium backdrop-blur-sm">
-                Brugt af over 10.000 studerende
-              </span>
-            </motion.div>
-            
-            <div className="flex justify-center mb-12">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              <Button 
+                size="lg" 
+                className="btn-epic text-white px-8 py-6 text-lg rounded-lg"
+                onClick={handleEvaluateClick}
+                disabled={isLoading}
               >
-                <Button 
-                  size="lg" 
-                  className="btn-epic text-white px-8 py-6 text-lg rounded-lg"
-                  onClick={handleEvaluateClick}
-                  disabled={isLoading}
-                >
-                  <Zap className="mr-2 h-5 w-5 animate-pulse" />
-                  {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
-                </Button>
-              </motion.div>
-            </div>
+                <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
+              </Button>
+            </motion.div>
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
               <motion.div 

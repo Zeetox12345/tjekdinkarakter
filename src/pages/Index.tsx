@@ -13,7 +13,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { AccuracyStats } from "@/components/AccuracyStats";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { user } = useAuth();

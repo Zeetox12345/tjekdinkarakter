@@ -105,59 +105,94 @@ const Index = () => {
     }
   };
 
-  return <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 bg-white border-b border-gray-100">
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
+      <header className="w-full py-16 px-4 sm:px-6 lg:px-8 hero-gradient">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="mb-12"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            <motion.h1 
+              className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-6"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
               Din AI-Drevne Karakterguide
-            </h1>
-            <p className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
+            </motion.h1>
+            <motion.p 
+              className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
-            </p>
+            </motion.p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="max-w-3xl mx-auto mt-8"
+            className="max-w-3xl mx-auto"
           >
-            <div className="flex items-center justify-center mb-8">
-              <span className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+            <motion.div 
+              className="flex items-center justify-center mb-8"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <span className="px-6 py-3 bg-primary/10 text-primary rounded-full text-sm font-medium backdrop-blur-sm">
                 Brugt af over 10.000 studerende
               </span>
-            </div>
+            </motion.div>
             
-            <div className="flex justify-center mb-8">
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all"
-                onClick={handleEvaluateClick}
-                disabled={isLoading}
+            <div className="flex justify-center mb-12">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Zap className="mr-2 h-5 w-5" />
-                {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
-              </Button>
+                <Button 
+                  size="lg" 
+                  className="btn-epic text-white px-8 py-6 text-lg rounded-lg"
+                  onClick={handleEvaluateClick}
+                  disabled={isLoading}
+                >
+                  <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                  {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
+                </Button>
+              </motion.div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
-              <div className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-primary" />
-                <span className="text-sm text-gray-600">AI-drevet analyse</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                <span className="text-sm text-gray-600">98% nøjagtighed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
-                <span className="text-sm text-gray-600">Svar på sekunder</span>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Brain className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">AI-drevet analyse</span>
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Target className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">98% nøjagtighed</span>
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <Zap className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">Svar på sekunder</span>
+              </motion.div>
             </div>
           </motion.div>
         </div>

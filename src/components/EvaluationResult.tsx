@@ -49,7 +49,7 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
               </ul>
               {!isPremium && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
+                  <div className="absolute inset-0 bg-white/90 backdrop-blur-[8px]" />
                   <Button className="relative z-10" variant="outline">
                     <Lock className="mr-2 h-4 w-4" />
                     Se styrker med Premium
@@ -74,7 +74,7 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
               </ul>
               {!isPremium && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
+                  <div className="absolute inset-0 bg-white/90 backdrop-blur-[8px]" />
                   <Button className="relative z-10" variant="outline">
                     <Lock className="mr-2 h-4 w-4" />
                     Se forbedringsmuligheder med Premium

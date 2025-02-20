@@ -106,101 +106,100 @@ const Index = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow">
-        <header className="w-full py-12 px-4 sm:px-6 lg:px-8 hero-gradient">
-          <div className="max-w-7xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
+      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 hero-gradient">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <motion.h1 
+              className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-6"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
-              className="mb-12"
             >
-              <motion.h1 
-                className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-6"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                Din AI-Drevne Karakterguide
-              </motion.h1>
-              <motion.p 
-                className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              Din AI-Drevne Karakterguide
+            </motion.h1>
+            <motion.p 
+              className="mt-4 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="max-w-3xl mx-auto"
             >
-              <motion.div 
-                className="flex items-center justify-center mb-8"
-                whileHover={{ scale: 1.05 }}
+              Få øjeblikkelig indsigt i din karakter med Danmarks førende AI-karakterestimator
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-3xl mx-auto"
+          >
+            <motion.div 
+              className="flex items-center justify-center mb-8"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <span className="px-6 py-3 bg-primary/10 text-primary rounded-full text-sm font-medium backdrop-blur-sm">
+                Brugt af over 10.000 studerende
+              </span>
+            </motion.div>
+            
+            <div className="flex justify-center mb-12">
+              <motion.div
+                whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <span className="px-6 py-3 bg-primary/10 text-primary rounded-full text-sm font-medium backdrop-blur-sm">
-                  Brugt af over 10.000 studerende
-                </span>
+                <Button 
+                  size="lg" 
+                  className="btn-epic text-white px-8 py-6 text-lg rounded-lg"
+                  onClick={handleEvaluateClick}
+                  disabled={isLoading}
+                >
+                  <Zap className="mr-2 h-5 w-5 animate-pulse" />
+                  {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
+                </Button>
               </motion.div>
-              
-              <div className="flex justify-center mb-12">
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                >
-                  <Button 
-                    size="lg" 
-                    className="btn-epic text-white px-8 py-6 text-lg rounded-lg"
-                    onClick={handleEvaluateClick}
-                    disabled={isLoading}
-                  >
-                    <Zap className="mr-2 h-5 w-5 animate-pulse" />
-                    {isLoading ? "Vurderer..." : "Få øjeblikkelig vurdering"}
-                  </Button>
-                </motion.div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
-                <motion.div 
-                  className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                  <Brain className="h-6 w-6 text-primary animate-float" />
-                  <span className="text-sm font-medium text-gray-700">AI-drevet analyse</span>
-                </motion.div>
-                <motion.div 
-                  className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                  <Target className="h-6 w-6 text-primary animate-float" />
-                  <span className="text-sm font-medium text-gray-700">98% nøjagtighed</span>
-                </motion.div>
-                <motion.div 
-                  className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                >
-                  <Zap className="h-6 w-6 text-primary animate-float" />
-                  <span className="text-sm font-medium text-gray-700">Svar på sekunder</span>
-                </motion.div>
-              </div>
-            </motion.div>
-          </div>
-        </header>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                <Brain className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">AI-drevet analyse</span>
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+              >
+                <Target className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">98% nøjagtighed</span>
+              </motion.div>
+              <motion.div 
+                className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
+              >
+                <Zap className="h-6 w-6 text-primary animate-float" />
+                <span className="text-sm font-medium text-gray-700">Svar på sekunder</span>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </header>
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <section className="mb-6">
           <AccuracyStats />
         </section>
@@ -366,57 +365,50 @@ const Index = () => {
             </Card>
           </motion.div>
         </div>
+
+        <footer className="border-t border-gray-200 bg-white/50 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div>
+                <h4 className="font-semibold mb-4">Om os</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link to="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
+                      Kontakt
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/faq" className="text-gray-600 hover:text-gray-900 transition-colors">
+                      FAQ
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-4">Juridisk</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link to="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">
+                      Privatlivspolitik
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">
+                      Vilkår & betingelser
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-8 pt-8 border-t border-gray-200">
+              <p className="text-center text-gray-500">
+                © {new Date().getFullYear()} TjekDinKarakter.dk. Alle rettigheder forbeholdes.
+              </p>
+            </div>
+          </div>
+        </footer>
       </main>
-
-      <Footer />
-    </div>
-  );
-};
-
-const Footer = () => {
-  return (
-    <footer className="border-t border-gray-200 bg-white/50 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div>
-            <h4 className="font-semibold mb-4">Om os</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  Kontakt
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  FAQ
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-semibold mb-4">Juridisk</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  Privatlivspolitik
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">
-                  Vilkår & betingelser
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-center text-gray-500">
-            © {new Date().getFullYear()} TjekDinKarakter.dk. Alle rettigheder forbeholdes.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
+    </div>;
 };
 
 export default Index;

@@ -29,7 +29,7 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
           <h3 className="text-3xl font-bold text-primary">Karakter: {evaluation.grade}</h3>
           {!isPremium && numericGrade < 10 && (
             <p className="text-primary mt-2 font-medium">
-              Få {potentialGrade}-tal ved at forbedre disse punkter! Opgrader til Premium for at se hvordan.
+              Opgrader til Premium og lær hvordan du kan forbedre din opgave til et {potentialGrade}tal!
             </p>
           )}
           <p className="text-gray-600 mt-2">{evaluation.reasoning}</p>
@@ -49,7 +49,7 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
               </ul>
               {!isPremium && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-[4px]" />
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
                   <Button className="relative z-10" variant="outline">
                     <Lock className="mr-2 h-4 w-4" />
                     Se styrker med Premium
@@ -74,7 +74,7 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
               </ul>
               {!isPremium && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-white/80 backdrop-blur-[4px]" />
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px]" />
                   <Button className="relative z-10" variant="outline">
                     <Lock className="mr-2 h-4 w-4" />
                     Se forbedringsmuligheder med Premium

@@ -62,6 +62,22 @@ export const evaluateAssignment = async (
       throw new Error('No evaluation data received');
     }
 
+    // After successful evaluation, insert into evaluations table which triggers the daily usage counter
+    const { error: insertError } = await supabase
+      .from('evaluations')
+      .insert({
+        assignment_text: assignmentContent,
+        instructions_text: instructionsContent,
+        grade: data.grade,
+        reasoning: data.reasoning,
+        improvements: data.improvements,
+        strengths: data.strengths,
+      });
+
+    if (insertError) {
+      console.error('Error inserting evaluation:', insertError);
+    }
+
     return data;
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);

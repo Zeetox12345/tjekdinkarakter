@@ -12,7 +12,7 @@ interface DailyUsageProps {
 export function DailyUsage({ userId }: DailyUsageProps) {
   const [usage, setUsage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
-  const MAX_DAILY_USES = 3; // Maximum allowed uses per day
+  const MAX_DAILY_USES = 5; // Updated to 5 uses per day
 
   useEffect(() => {
     async function fetchDailyUsage() {

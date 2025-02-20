@@ -38,8 +38,12 @@ export function MainNav({ user }: { user: User | null }) {
   return (
     <nav className="border-b">
       <div className="flex h-16 items-center px-4 container mx-auto">
-        <Link to="/" className="font-bold text-xl">
-          TjekDinKarakter.dk
+        <Link to="/" className="flex items-center">
+          <span className="font-serif text-2xl tracking-tighter">
+            tjekdinkarakter
+            <span className="text-primary font-sans">.</span>
+            <span className="text-xs align-top ml-0.5 tracking-tight">dk</span>
+          </span>
         </Link>
         <div className="ml-auto flex items-center space-x-4">
           {user ? (

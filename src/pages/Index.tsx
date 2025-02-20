@@ -106,7 +106,7 @@ const Index = () => {
   };
 
   return <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
-      <header className="w-full py-16 px-4 sm:px-6 lg:px-8 hero-gradient">
+      <header className="w-full py-12 px-4 sm:px-6 lg:px-8 hero-gradient">
         <div className="max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -198,8 +198,8 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <section className="mb-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+        <section className="mb-6">
           <AccuracyStats />
         </section>
 

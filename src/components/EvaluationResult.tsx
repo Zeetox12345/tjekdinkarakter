@@ -15,6 +15,9 @@ interface EvaluationResultProps {
 }
 
 const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultProps) => {
+  const numericGrade = parseInt(evaluation.grade);
+  const potentialGrade = Math.min(10, numericGrade + 3); // Cap at 10
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,6 +27,11 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
       <Card className="p-6 space-y-6">
         <div className="text-center">
           <h3 className="text-3xl font-bold text-primary">Karakter: {evaluation.grade}</h3>
+          {!isPremium && numericGrade < 10 && (
+            <p className="text-primary mt-2 font-medium">
+              Opgrader til Premium og lær hvordan du kan forbedre din opgave til et {potentialGrade}tal!
+            </p>
+          )}
           <p className="text-gray-600 mt-2">{evaluation.reasoning}</p>
         </div>
 
@@ -83,6 +91,9 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
               <Lock className="mr-2 h-4 w-4" />
               Opgrader til Premium - 79 kr./måned
             </Button>
+            <p className="text-sm text-gray-600 mt-2">
+              Få adgang til detaljeret feedback og lær hvordan du kan forbedre din karakter
+            </p>
           </div>
         )}
       </Card>

@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { AccuracyStats } from "@/components/AccuracyStats";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const {
@@ -372,14 +373,14 @@ const Index = () => {
                 <h4 className="font-semibold mb-4">Om os</h4>
                 <ul className="space-y-2">
                   <li>
-                    <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link to="/contact" className="text-gray-600 hover:text-gray-900 transition-colors">
                       Kontakt
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link to="/faq" className="text-gray-600 hover:text-gray-900 transition-colors">
                       FAQ
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -387,14 +388,14 @@ const Index = () => {
                 <h4 className="font-semibold mb-4">Juridisk</h4>
                 <ul className="space-y-2">
                   <li>
-                    <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link to="/privacy" className="text-gray-600 hover:text-gray-900 transition-colors">
                       Privatlivspolitik
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors">
+                    <Link to="/terms" className="text-gray-600 hover:text-gray-900 transition-colors">
                       Vilkår & betingelser
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>

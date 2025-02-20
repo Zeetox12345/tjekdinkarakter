@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import EvaluationResult from "@/components/EvaluationResult";
 import { Progress } from "@/components/ui/progress";
@@ -13,11 +13,10 @@ import { useAuth } from "@/components/AuthProvider";
 import { AccuracyStats } from "@/components/AccuracyStats";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
 
 const Index = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [assignmentText, setAssignmentText] = useState("");
@@ -27,9 +26,30 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [evaluation, setEvaluation] = useState<any>(null);
   const [progress, setProgress] = useState(0);
-  const {
-    toast
-  } = useToast();
+  const [dailyUsage, setDailyUsage] = useState<number>(0);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user) {
+      checkDailyUsage();
+    }
+  }, [user]);
+
+  const checkDailyUsage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('daily_evaluation_usage')
+        .select('count')
+        .eq('user_id', user?.id)
+        .eq('date', new Date().toISOString().split('T')[0])
+        .single();
+
+      if (error) throw error;
+      setDailyUsage(data?.count || 0);
+    } catch (error) {
+      console.error('Error checking daily usage:', error);
+    }
+  };
 
   const handleAssignmentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -67,6 +87,14 @@ const Index = () => {
       setShowAuthDialog(true);
       return;
     }
+    if (dailyUsage >= 5) {
+      toast({
+        title: "Daglig grænse nået",
+        description: "Du har nået din daglige grænse på 5 evalueringer. Opgrader til Premium for ubegrænset evalueringer.",
+        variant: "destructive"
+      });
+      return;
+    }
     handleEvaluate();
   };
 
@@ -94,6 +122,7 @@ const Index = () => {
       const result = await evaluateAssignment(assignmentFile, assignmentText, instructionsFile, instructionsText);
       setEvaluation(result);
       setProgress(100);
+      await checkDailyUsage();
     } catch (error) {
       toast({
         title: "Fejl ved vurdering",
@@ -258,9 +287,14 @@ const Index = () => {
             </Card>
           </div>}
 
-        {evaluation && !isLoading && <div className="max-w-4xl mx-auto mb-8">
-            <EvaluationResult evaluation={evaluation} />
-          </div>}
+        {evaluation && !isLoading && (
+          <div className="max-w-4xl mx-auto mb-8">
+            <EvaluationResult 
+              evaluation={evaluation} 
+              isPremium={false}
+            />
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto mb-16">
           <Card className="p-6 bg-white/50 backdrop-blur-sm">

@@ -29,12 +29,11 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF file loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Create PDF document loading task with alternative configuration
+    // Create PDF document loading task with type-safe configuration
     const loadingTask = pdfjs.getDocument({
       data: arrayBuffer,
       verbosity: 1,
       disableFontFace: true, // Disable font loading to avoid potential issues
-      nativeImageDecoderSupport: 'none',
       ignoreErrors: true,
     });
 

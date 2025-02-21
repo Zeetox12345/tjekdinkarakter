@@ -21,12 +21,12 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF file loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Create PDF document loading task
+    // Create PDF document loading task with more robust configuration
     const loadingTask = pdfjs.getDocument({
-      data: arrayBuffer,
-      useWorkerFetch: true,
-      isEvalSupported: true,
-      useSystemFonts: true,
+      data: new Uint8Array(arrayBuffer),
+      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@' + pdfjs.version + '/cmaps/',
+      cMapPacked: true,
+      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@' + pdfjs.version + '/standard_fonts/',
     });
 
     console.log('PDF loading task created');

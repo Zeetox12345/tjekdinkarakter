@@ -101,12 +101,23 @@ const Index = () => {
     }
   };
 
-  const handleEvaluateClick = () => {
+  const handleEvaluateClick = async () => {
     if (!user) {
       setShowAuthDialog(true);
       return;
     }
-    if (dailyUsage >= 5) {
+
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    const isAdmin = !!roleData;
+
+    if (!isAdmin && dailyUsage >= 5) {
       toast({
         title: "Daglig grænse nået",
         description: "Du har nået din daglige grænse på 5 evalueringer. Opgrader til Premium for ubegrænset evalueringer.",

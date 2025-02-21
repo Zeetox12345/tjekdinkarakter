@@ -120,6 +120,33 @@ export type Database = {
         }
         Relationships: []
       }
+      anonymous_evaluation_usage: {
+        Row: {
+          id: string
+          ip_address: string
+          date: string
+          count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          ip_address: string
+          date?: string
+          count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string
+          date?: string
+          count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

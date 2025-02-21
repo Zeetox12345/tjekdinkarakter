@@ -1,9 +1,8 @@
-
 import { FileText } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import EvaluationResult from "@/components/EvaluationResult";
 import { Progress } from "@/components/ui/progress";
@@ -30,35 +29,74 @@ const Index = () => {
   const [evaluation, setEvaluation] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [dailyUsage, setDailyUsage] = useState<number>(0);
+  const [anonymousUsage, setAnonymousUsage] = useState<number>(0);
   const { toast } = useToast();
 
-  const checkDailyUsage = async () => {
+  const checkUsage = async () => {
     try {
-      if (!user?.id) return 0;
-      
-      const { data, error } = await supabase
-        .from('daily_evaluation_usage')
-        .select('count')
-        .eq('user_id', user.id)
-        .eq('date', new Date().toISOString().split('T')[0])
-        .single();
+      if (user?.id) {
+        // Check authenticated user usage
+        const { data, error } = await supabase
+          .from('daily_evaluation_usage')
+          .select('count')
+          .eq('user_id', user.id)
+          .eq('date', new Date().toISOString().split('T')[0])
+          .single();
 
-      if (error) throw error;
-      const count = data?.count || 0;
-      setDailyUsage(count);
-      return count;
+        if (error) throw error;
+        setDailyUsage(data?.count || 0);
+      } else {
+        // For anonymous users, use local storage in development
+        if (window.location.hostname === 'localhost') {
+          const today = new Date().toISOString().split('T')[0];
+          const localStorageKey = `anonymous_usage_${today}`;
+          const storedUsage = localStorage.getItem(localStorageKey);
+          setAnonymousUsage(storedUsage ? parseInt(storedUsage, 10) : 0);
+        } else {
+          // Production environment - use Supabase
+          const { data: { session } } = await supabase.auth.getSession();
+          const headers = session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {};
+          const { data: ipData } = await supabase.functions.invoke('get-client-ip', { headers });
+          const clientIp = ipData?.ip;
+
+          if (clientIp) {
+            const { data, error } = await supabase
+              .from('anonymous_evaluation_usage')
+              .select('count')
+              .eq('ip_address', clientIp)
+              .eq('date', new Date().toISOString().split('T')[0])
+              .single();
+
+            if (error && error.code !== 'PGRST116') { // Ignore "no rows returned" error
+              throw error;
+            }
+            setAnonymousUsage(data?.count || 0);
+          }
+        }
+      }
     } catch (error) {
-      console.error('Error checking daily usage:', error);
-      return 0;
+      console.error('Error checking usage:', error);
     }
   };
 
-  const handleEvaluateClick = async () => {
-    if (!user) {
-      setShowAuthDialog(true);
-      return;
+  // Function to increment anonymous usage in local storage
+  const incrementLocalAnonymousUsage = () => {
+    if (window.location.hostname === 'localhost') {
+      const today = new Date().toISOString().split('T')[0];
+      const localStorageKey = `anonymous_usage_${today}`;
+      const currentUsage = localStorage.getItem(localStorageKey);
+      const newUsage = (currentUsage ? parseInt(currentUsage, 10) : 0) + 1;
+      localStorage.setItem(localStorageKey, newUsage.toString());
+      setAnonymousUsage(newUsage);
     }
+  };
 
+  useEffect(() => {
+    checkUsage();
+  }, [user]);
+
+  const handleEvaluateClick = async () => {
+    // First check if there's any content to evaluate
     if (!assignmentText && !assignmentFile) {
       toast({
         title: "Ingen opgave at vurdere",
@@ -68,9 +106,22 @@ const Index = () => {
       return;
     }
 
-    // Check daily usage before starting evaluation
-    const currentUsage = await checkDailyUsage();
+    // Check usage limits for both anonymous and authenticated users
+    await checkUsage();
 
+    if (!user) {
+      // Handle anonymous user
+      if (anonymousUsage >= 5) {
+        // Show auth dialog only if anonymous user has no prompts left
+        setShowAuthDialog(true);
+        return;
+      }
+      // If they have prompts left, continue to evaluation
+      handleEvaluate();
+      return;
+    }
+
+    // Handle authenticated user
     // Check if user is admin
     const { data: roleData } = await supabase
       .from('user_roles')
@@ -81,7 +132,7 @@ const Index = () => {
 
     const isAdmin = !!roleData;
 
-    if (!isAdmin && currentUsage >= 5) {
+    if (!isAdmin && dailyUsage >= 5) {
       toast({
         title: "Daglig grænse nået",
         description: "Du har nået din daglige grænse på 5 evalueringer.",
@@ -112,7 +163,13 @@ const Index = () => {
       const result = await evaluateAssignment(assignmentFile, assignmentText, instructionsFile, instructionsText);
       setEvaluation(result);
       setProgress(100);
-      await checkDailyUsage(); // Update usage count after successful evaluation
+      
+      // Increment usage count after successful evaluation
+      if (!user && window.location.hostname === 'localhost') {
+        incrementLocalAnonymousUsage();
+      } else {
+        await checkUsage();
+      }
     } catch (error) {
       toast({
         title: "Fejl ved vurdering",
@@ -154,6 +211,14 @@ const Index = () => {
           setShowAuthDialog={setShowAuthDialog}
           setShowPremiumDialog={setShowPremiumDialog}
         />
+
+        {user && dailyUsage >= 5 && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <p className="text-yellow-700 text-sm">
+              Du har nået din daglige grænse på 5 evalueringer.
+            </p>
+          </div>
+        )}
 
         {isLoading && (
           <div className="max-w-xl mx-auto mb-8">

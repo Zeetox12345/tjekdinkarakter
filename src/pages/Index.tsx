@@ -214,14 +214,6 @@ const Index = () => {
           setShowPremiumDialog={setShowPremiumDialog}
         />
 
-        {user && dailyUsage >= 5 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <p className="text-yellow-700 text-sm">
-              Du har nået din daglige grænse på 5 evalueringer.
-            </p>
-          </div>
-        )}
-
         {isLoading && (
           <div className="max-w-xl mx-auto mb-8">
             <Card className="p-6">

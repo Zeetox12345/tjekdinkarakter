@@ -2,11 +2,19 @@
 import * as pdfjs from 'pdfjs-dist';
 import { supabase } from "@/integrations/supabase/client";
 
-// Initialize PDF.js once
-const initializePdfJs = () => {
-  if (typeof window !== 'undefined' && !pdfjs.GlobalWorkerOptions.workerSrc) {
-    console.log('Initializing PDF.js with version:', pdfjs.version);
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Initialize PDF.js worker with a more reliable approach
+const initializePdfJs = async () => {
+  if (typeof window === 'undefined' || pdfjs.GlobalWorkerOptions.workerSrc) return;
+
+  try {
+    console.log('Initializing PDF.js worker...');
+    const workerSrc = await import('pdfjs-dist/build/pdf.worker.js?url');
+    pdfjs.GlobalWorkerOptions.workerSrc = workerSrc.default;
+    console.log('PDF.js worker initialized successfully');
+  } catch (error) {
+    console.error('Failed to load PDF.js worker:', error);
+    // Fallback to legacy worker if dynamic import fails
+    pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.js`;
   }
 };
 
@@ -14,19 +22,20 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
   try {
     console.log('Starting PDF processing for file:', pdfFile.name);
     
-    // Initialize PDF.js
-    initializePdfJs();
+    // Initialize worker
+    await initializePdfJs();
     
     // Load the PDF file
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF file loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Create PDF document loading task with more robust configuration
+    // Create PDF document loading task with alternative configuration
     const loadingTask = pdfjs.getDocument({
-      data: new Uint8Array(arrayBuffer),
-      cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@' + pdfjs.version + '/cmaps/',
-      cMapPacked: true,
-      standardFontDataUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@' + pdfjs.version + '/standard_fonts/',
+      data: arrayBuffer,
+      verbosity: 1,
+      disableFontFace: true, // Disable font loading to avoid potential issues
+      nativeImageDecoderSupport: 'none',
+      ignoreErrors: true,
     });
 
     console.log('PDF loading task created');

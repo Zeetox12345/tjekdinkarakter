@@ -86,31 +86,49 @@ export const AnimatedHeader = ({ onEvaluateClick, isLoading }: AnimatedHeaderPro
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 text-left">
             <motion.div 
-              className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+              className="flex items-center gap-4 bg-white/10 backdrop-blur-[2px] p-4 rounded-2xl group cursor-default"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
+              whileHover={{ scale: 1.02 }}
             >
-              <Brain className="h-6 w-6 text-primary animate-float" />
-              <span className="text-sm font-medium text-gray-700">AI-drevet analyse</span>
+              <div className="relative">
+                <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm group-hover:blur-md transition-all duration-300"></div>
+                <Brain className="h-6 w-6 text-primary relative animate-pulse-slow group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 group-hover:to-primary/80 transition-all duration-300">
+                AI-drevet analyse
+              </span>
             </motion.div>
             <motion.div 
-              className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+              className="flex items-center gap-4 bg-white/10 backdrop-blur-[2px] p-4 rounded-2xl group cursor-default"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
+              whileHover={{ scale: 1.02 }}
             >
-              <Target className="h-6 w-6 text-primary animate-float" />
-              <span className="text-sm font-medium text-gray-700">98% nøjagtighed</span>
+              <div className="relative">
+                <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm group-hover:blur-md transition-all duration-300"></div>
+                <Target className="h-6 w-6 text-primary relative group-hover:rotate-45 transition-transform duration-300" />
+              </div>
+              <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 group-hover:to-primary/80 transition-all duration-300">
+                98% nøjagtighed
+              </span>
             </motion.div>
             <motion.div 
-              className="flex items-center gap-3 bg-white/50 backdrop-blur-sm p-4 rounded-lg card-glow"
+              className="flex items-center gap-4 bg-white/10 backdrop-blur-[2px] p-4 rounded-2xl group cursor-default"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.5 }}
+              whileHover={{ scale: 1.02 }}
             >
-              <Zap className="h-6 w-6 text-primary animate-float" />
-              <span className="text-sm font-medium text-gray-700">Svar på sekunder</span>
+              <div className="relative">
+                <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm group-hover:blur-md transition-all duration-300"></div>
+                <Zap className="h-6 w-6 text-primary relative group-hover:scale-110 transition-transform duration-300" />
+              </div>
+              <span className="text-sm font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-700 to-gray-600 group-hover:to-primary/80 transition-all duration-300">
+                Svar på sekunder
+              </span>
             </motion.div>
           </div>
         </motion.div>

@@ -197,8 +197,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-primary/10">
-      <AnimatedHeader onEvaluateClick={handleEvaluateClick} isLoading={isLoading} />
+    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/20">
+      <div className="pt-24">
+        <AnimatedHeader onEvaluateClick={handleEvaluateClick} isLoading={isLoading} />
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
         <section className="mb-6">

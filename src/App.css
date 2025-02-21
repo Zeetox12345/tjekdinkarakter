@@ -1,4 +1,3 @@
-
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -9,9 +8,11 @@
 .hero-gradient {
   background: linear-gradient(
     135deg,
-    rgba(88, 28, 255, 0.1) 0%,
-    rgba(123, 97, 255, 0.1) 100%
+    rgba(88, 28, 255, 0.15) 0%,
+    rgba(123, 97, 255, 0.15) 50%,
+    rgba(88, 28, 255, 0.1) 100%
   );
+  backdrop-filter: blur(8px);
 }
 
 .text-glow {

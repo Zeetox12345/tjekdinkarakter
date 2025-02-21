@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -35,12 +34,11 @@ export function MainNav({
   };
 
   return (
-    <nav className="border-b">
+    <nav className="absolute top-0 left-0 right-0 z-10 bg-transparent">
       <div className="flex h-16 items-center px-4 container mx-auto">
         <Link to="/" className="flex items-center">
-          <span className="font-serif text-2xl tracking-tighter">
+          <span className="font-sans text-2xl tracking-tighter font-bold">
             tjekdinkarakter
-            <span className="text-primary font-sans">.</span>
           </span>
         </Link>
         <div className="ml-auto flex items-center space-x-4">

@@ -1,4 +1,3 @@
-
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, Target, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,7 @@ export const AnimatedHeader = ({ onEvaluateClick, isLoading }: AnimatedHeaderPro
   }, []);
 
   return (
-    <header className="w-full py-8 px-4 sm:px-6 lg:px-8 hero-gradient">
+    <header className="w-full py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-white/50">
       <div className="max-w-7xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

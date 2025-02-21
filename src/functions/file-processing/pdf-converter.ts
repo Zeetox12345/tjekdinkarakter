@@ -1,4 +1,3 @@
-
 import * as pdfjs from 'pdfjs-dist';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -6,9 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 if (typeof window !== 'undefined') {
   try {
     console.log('Setting up PDF.js worker');
-    // Use unpkg CDN which is more reliable for PDF.js
-    pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-    console.log('PDF.js worker setup complete with version:', pdfjs.version);
+    // Use the worker from the public directory
+    pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    console.log('PDF.js worker setup complete');
   } catch (error) {
     console.error('Error setting up PDF.js worker:', error);
   }
@@ -22,13 +21,10 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
     const arrayBuffer = await pdfFile.arrayBuffer();
     console.log('PDF loaded as ArrayBuffer, size:', arrayBuffer.byteLength);
     
-    // Wait for worker to be ready
-    await pdfjs.getDocument({ data: new Uint8Array(0) }).promise.catch(() => {});
-    console.log('PDF.js worker is ready');
-    
-    // Create loading task with minimal configuration
+    // Create loading task with version check
+    console.log('PDF.js version:', pdfjs.version);
     const loadingTask = pdfjs.getDocument({
-      data: new Uint8Array(arrayBuffer),
+      data: arrayBuffer,
       useSystemFonts: true,
     });
     
@@ -42,12 +38,19 @@ export const convertPDFtoDOCX = async (pdfFile: File): Promise<string> => {
       console.log(`Processing PDF page ${pageNum}/${pdf.numPages}`);
       const page = await pdf.getPage(pageNum);
       const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: any) => item.str)
-        .filter(str => str && str.trim())
-        .join(' ');
       
-      if (pageText.trim()) {
+      // Improved text extraction with better whitespace handling
+      const pageText = content.items
+        .map((item: any) => {
+          // Handle different types of spaces and line breaks
+          const text = item.str || '';
+          const hasTrailingSpace = item.hasEOL || item.hasSpace;
+          return text + (hasTrailingSpace ? ' ' : '');
+        })
+        .join('')
+        .trim();
+      
+      if (pageText) {
         textContent.push(pageText);
         console.log(`Page ${pageNum} text extracted, length:`, pageText.length);
       }

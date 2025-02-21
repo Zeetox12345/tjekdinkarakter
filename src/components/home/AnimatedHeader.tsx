@@ -39,7 +39,7 @@ export const AnimatedHeader = ({ onEvaluateClick, isLoading }: AnimatedHeaderPro
           className="mb-8"
         >
           <motion.h1 
-            className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-4"
+            className="text-5xl sm:text-6xl font-bold text-gray-900 tracking-tight text-glow mb-8"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
@@ -54,7 +54,7 @@ export const AnimatedHeader = ({ onEvaluateClick, isLoading }: AnimatedHeaderPro
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="mt-2 text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto"
+                className="mt-2 text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto"
               >
                 {headerTexts[currentTextIndex]}
               </motion.p>

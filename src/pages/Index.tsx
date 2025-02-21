@@ -34,17 +34,22 @@ const Index = () => {
 
   const checkDailyUsage = async () => {
     try {
+      if (!user?.id) return 0;
+      
       const { data, error } = await supabase
         .from('daily_evaluation_usage')
         .select('count')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .eq('date', new Date().toISOString().split('T')[0])
         .single();
 
       if (error) throw error;
-      setDailyUsage(data?.count || 0);
+      const count = data?.count || 0;
+      setDailyUsage(count);
+      return count;
     } catch (error) {
       console.error('Error checking daily usage:', error);
+      return 0;
     }
   };
 
@@ -53,6 +58,18 @@ const Index = () => {
       setShowAuthDialog(true);
       return;
     }
+
+    if (!assignmentText && !assignmentFile) {
+      toast({
+        title: "Ingen opgave at vurdere",
+        description: "Du skal enten uploade en fil eller indtaste opgavetekst",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check daily usage before starting evaluation
+    const currentUsage = await checkDailyUsage();
 
     // Check if user is admin
     const { data: roleData } = await supabase
@@ -64,7 +81,7 @@ const Index = () => {
 
     const isAdmin = !!roleData;
 
-    if (!isAdmin && dailyUsage >= 5) {
+    if (!isAdmin && currentUsage >= 5) {
       toast({
         title: "Daglig grænse nået",
         description: "Du har nået din daglige grænse på 5 evalueringer.",
@@ -73,18 +90,12 @@ const Index = () => {
       setShowPremiumDialog(true);
       return;
     }
+
+    // Only start loading and evaluation if we haven't hit the limit
     handleEvaluate();
   };
 
   const handleEvaluate = async () => {
-    if (!assignmentText && !assignmentFile) {
-      toast({
-        title: "Ingen opgave at vurdere",
-        description: "Du skal enten uploade en fil eller indtaste opgavetekst",
-        variant: "destructive"
-      });
-      return;
-    }
     setIsLoading(true);
     setProgress(0);
     const progressInterval = setInterval(() => {
@@ -96,11 +107,12 @@ const Index = () => {
         return prev + 10;
       });
     }, 1000);
+    
     try {
       const result = await evaluateAssignment(assignmentFile, assignmentText, instructionsFile, instructionsText);
       setEvaluation(result);
       setProgress(100);
-      await checkDailyUsage();
+      await checkDailyUsage(); // Update usage count after successful evaluation
     } catch (error) {
       toast({
         title: "Fejl ved vurdering",

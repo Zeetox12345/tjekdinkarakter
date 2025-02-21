@@ -1,12 +1,13 @@
-
 import Footer from "@/components/Footer";
 
 const Terms = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="container mx-auto py-8 flex-grow">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white/50 to-primary/10 relative overflow-hidden flex flex-col">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(88,28,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(123,97,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="container mx-auto py-8 flex-grow relative">
         <h1 className="text-4xl font-bold text-center mb-8">Vilkår og Betingelser</h1>
-        <div className="max-w-3xl mx-auto prose">
+        <div className="max-w-3xl mx-auto prose bg-white/80 backdrop-blur-sm rounded-lg p-8">
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Acceptér vilkår</h2>
             <p className="mb-4">

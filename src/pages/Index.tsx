@@ -197,12 +197,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/20">
-      <div className="pt-24">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white/50 to-primary/10 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(88,28,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(123,97,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="pt-24 relative">
         <AnimatedHeader onEvaluateClick={handleEvaluateClick} isLoading={isLoading} />
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 relative">
         <section className="mb-6">
           <AccuracyStats />
         </section>

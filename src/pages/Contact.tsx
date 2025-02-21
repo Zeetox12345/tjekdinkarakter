@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,11 +17,13 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="container mx-auto py-8 flex-grow">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white/50 to-primary/10 relative overflow-hidden flex flex-col">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(88,28,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(123,97,255,0.1),transparent_50%)] pointer-events-none"></div>
+      <div className="container mx-auto py-8 flex-grow relative">
         <h1 className="text-4xl font-bold text-center mb-8">Kontakt Os</h1>
         <div className="max-w-2xl mx-auto">
-          <Card>
+          <Card className="bg-white/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle>Send os en besked</CardTitle>
             </CardHeader>

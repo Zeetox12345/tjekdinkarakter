@@ -30,7 +30,7 @@ export const AnimatedHeader = ({ onEvaluateClick, isLoading }: AnimatedHeaderPro
   }, []);
 
   return (
-    <header className="w-full py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-white/50">
+    <header className="w-full py-16 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-7xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

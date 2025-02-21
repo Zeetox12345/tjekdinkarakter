@@ -1,8 +1,14 @@
 import { Card } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Lock, Star, TrendingUp, CheckCircle2, AlertCircle, BookOpen, Layout, MessageSquare, Brain, Lightbulb, LucideIcon } from "lucide-react";
+import { Lock, Star, TrendingUp, CheckCircle2, AlertCircle, BookOpen, Layout, MessageSquare, Brain, Lightbulb, LucideIcon, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useState } from "react";
 
 interface EvaluationResultProps {
   evaluation: {
@@ -59,7 +65,138 @@ const feedbackCategories: Record<string, FeedbackCategory> = {
 };
 
 const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultProps) => {
+  const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
+
+  const toggleItem = (id: string) => {
+    setOpenItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   const gradeColor = gradeColors[evaluation.grade] || { bg: "bg-gray-500", text: "text-gray-500" };
+
+  const renderStrengthItem = (strength: string, category: string) => {
+    const categoryConfig = feedbackCategories[category];
+    return (
+      <div className={cn(
+        "flex items-start space-x-2 p-3 rounded-lg",
+        categoryConfig?.bgColor || "bg-gray-50"
+      )}>
+        <span className={cn(
+          "shrink-0 mt-1",
+          categoryConfig?.color || "text-gray-500"
+        )}>✓</span>
+        <span className="text-gray-800">{strength.replace(`${category}: `, '')}</span>
+      </div>
+    );
+  };
+
+  const renderImprovementItem = (improvementText: string, category: string, index: number) => {
+    const id = `improvement-${category}-${index}`;
+    const isOpen = openItems[id];
+    const categoryConfig = feedbackCategories[category];
+    
+    // Remove category prefix and clean the text
+    const description = improvementText.replace(`${category}: `, '').trim();
+    
+    // Generate examples based on the improvement type
+    const generateExample = (desc: string, category: string): {
+      citation: string;
+      improvement: string;
+      explanation: string;
+    } => {
+      const examples = {
+        "Fagligt indhold": {
+          citation: "I denne periode var der modstand mod jøderne i Danmark",
+          improvement: "Under mellemkrigstiden observerede man en stigende antisemitisk tendens i det danske samfund, særligt blandt konservative kredse og i DNSAP's propaganda",
+          explanation: "Ved at bruge præcise fagbegreber og historiske referencer styrkes den faglige dybde og akademiske kvalitet af analysen."
+        },
+        "Struktur": {
+          citation: "Nu vil jeg gå videre til at snakke om...",
+          improvement: "Denne udvikling i antisemitismen skal ses i sammenhæng med den generelle politiske radikalisering i 1930'erne, hvor...",
+          explanation: "En stærkere overgang skaber bedre sammenhæng mellem afsnittene og tydeliggør den røde tråd i argumentationen."
+        },
+        "Sprog": {
+          citation: "Det var ret slemt hvordan de behandlede jøderne",
+          improvement: "Den systematiske diskrimination og forfølgelse af den jødiske befolkning vidner om antisemitismens alvorlige konsekvenser",
+          explanation: "Et mere præcist og akademisk sprog styrker tekstens troværdighed og formidler pointerne mere effektivt."
+        },
+        "Kritisk tænkning": {
+          citation: "Alle danskere var imod antisemitismen",
+          improvement: "Mens mange danskere aktivt modsatte sig antisemitismen, var der også grupper i samfundet, særligt inden for DNSAP, der sympatiserede med de antisemitiske strømninger",
+          explanation: "Ved at belyse forskellige perspektiver og nuancer demonstreres en dybere forståelse af periodens kompleksitet."
+        },
+        "Praktisk anvendelse": {
+          citation: "Dette er stadig relevant i dag",
+          improvement: "Erfaringerne fra mellemkrigstidens antisemitisme er højaktuelle i dagens debat om minoriteters rettigheder og samfundets ansvar, eksempelvis i diskussionen om...",
+          explanation: "Konkrete nutidige eksempler gør analysen mere relevant og viser forståelse for historiens betydning for samtiden."
+        }
+      };
+
+      // Get the default example for the category
+      const defaultExample = examples[category as keyof typeof examples] || examples["Fagligt indhold"];
+      
+      // Customize the example based on the actual description
+      return {
+        citation: defaultExample.citation,
+        improvement: defaultExample.improvement,
+        explanation: `${defaultExample.explanation} ${desc}`
+      };
+    };
+
+    const example = generateExample(description, category);
+    
+    return (
+      <Collapsible
+        key={index}
+        open={isOpen}
+        onOpenChange={() => toggleItem(id)}
+        className={cn(
+          "rounded-lg overflow-hidden transition-all",
+          categoryConfig?.bgColor || "bg-gray-50"
+        )}
+      >
+        <CollapsibleTrigger className="w-full">
+          <div className="flex items-start space-x-2 p-3">
+            <span className={cn(
+              "shrink-0 mt-1",
+              categoryConfig?.color || "text-gray-500"
+            )}>→</span>
+            <span className="text-gray-800 text-left flex-grow">{description}</span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 shrink-0 transition-transform duration-200",
+                isOpen ? "transform rotate-180" : ""
+              )}
+            />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="px-8 pb-3 space-y-3">
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-gray-500">Eksempel fra din tekst:</div>
+              <div className="text-sm bg-white/50 rounded-md p-3 italic text-gray-600">
+                "{example.citation}"
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-gray-500">Sådan kunne det formuleres bedre:</div>
+              <div className="text-sm bg-primary/5 rounded-md p-3 text-primary font-medium">
+                "{example.improvement}"
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-sm font-medium text-gray-500">Hvorfor det forbedrer opgaven:</div>
+              <div className="text-sm text-gray-600">
+                {example.explanation}
+              </div>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
+  };
 
   const categorizedFeedback = (items: string[], type: "strengths" | "improvements") => {
     const categorized = Object.keys(feedbackCategories).reduce((acc, category) => {
@@ -158,26 +295,9 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
                         {renderCategoryIcon(category)}
                         <h5 className="font-semibold text-gray-700">{category}</h5>
                       </div>
-                      <motion.ul className="space-y-3">
-                        {items.map((strength, index) => (
-                          <motion.li
-                            key={index}
-                            initial={{ x: -20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.8 + categoryIndex * 0.1 + index * 0.05 }}
-                            className={cn(
-                              "flex items-start space-x-2 p-3 rounded-lg",
-                              feedbackCategories[category]?.bgColor || "bg-gray-50"
-                            )}
-                          >
-                            <span className={cn(
-                              "shrink-0",
-                              feedbackCategories[category]?.color || "text-gray-500"
-                            )}>✓</span>
-                            <span className="text-gray-800">{strength.replace(`${category}: `, '')}</span>
-                          </motion.li>
-                        ))}
-                      </motion.ul>
+                      <motion.div className="space-y-3">
+                        {items.map((strength, index) => renderStrengthItem(strength, category))}
+                      </motion.div>
                     </motion.div>
                   ))}
                 </div>
@@ -223,26 +343,9 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
                         {renderCategoryIcon(category)}
                         <h5 className="font-semibold text-gray-700">{category}</h5>
                       </div>
-                      <motion.ul className="space-y-3">
-                        {items.map((improvement, index) => (
-                          <motion.li
-                            key={index}
-                            initial={{ x: 20, opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            transition={{ delay: 0.8 + categoryIndex * 0.1 + index * 0.05 }}
-                            className={cn(
-                              "flex items-start space-x-2 p-3 rounded-lg",
-                              feedbackCategories[category]?.bgColor || "bg-gray-50"
-                            )}
-                          >
-                            <span className={cn(
-                              "shrink-0",
-                              feedbackCategories[category]?.color || "text-gray-500"
-                            )}>→</span>
-                            <span className="text-gray-800">{improvement.replace(`${category}: `, '')}</span>
-                          </motion.li>
-                        ))}
-                      </motion.ul>
+                      <motion.div className="space-y-3">
+                        {items.map((improvement, index) => renderImprovementItem(improvement, category, index))}
+                      </motion.div>
                     </motion.div>
                   ))}
                 </div>

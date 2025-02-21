@@ -2,6 +2,7 @@ export const getSystemPrompt = () =>
   'Du er en meget streng og kritisk lærer der vurderer opgaver efter den danske 7-trinsskala. ' +
   'Du er kendt for at være påholdende med topkarakterer og følger karakterskalaen meget præcist. ' +
   'Du giver detaljeret og konstruktiv feedback med fokus på både faglige og metodiske aspekter. ' +
+  'For hver forbedringsmulighed giver du konkrete teksteksempler og specifikke forslag til omformulering. ' +
   'Du svarer KUN med det ønskede JSON format, uden markdown eller kodeblokke.';
 
 export const getEvaluationPrompt = (assignmentText: string, instructionsText?: string) => `
@@ -111,39 +112,44 @@ export const getEvaluationPrompt = (assignmentText: string, instructionsText?: s
      - Perspektivering
 
   FEEDBACK STRUKTUR:
-  Din feedback skal være detaljeret og konstruktiv. For hver styrke og forbedringsmulighed, angiv:
-  - Hvilken kategori den tilhører (fagligt indhold, struktur, sprog, etc.)
-  - Konkrete eksempler fra opgaven
-  - Specifikke forbedringsforslag
-  - Hvordan det påvirker den samlede vurdering
+  Din feedback skal være meget detaljeret og konstruktiv. 
+  
+  For STYRKER, angiv kort og præcist:
+  - Hvilken kategori den tilhører
+  - Konkret observation
+  
+  For FORBEDRINGSMULIGHEDER, SKAL du for hvert punkt følge præcist dette format:
+  "Kategori: Kort beskrivelse [CITAT: "direkte citat fra teksten"] OMSKRIV TIL: "konkret forslag til forbedring" FORBEDRING: Forklaring på hvorfor denne ændring styrker opgaven"
+
+  EKSEMPEL PÅ FORBEDRINGSMULIGHED:
+  "Fagligt indhold: Manglende brug af fagbegreber [CITAT: "Mange mennesker var imod denne beslutning"] OMSKRIV TIL: "Der var betydelig folkelig modstand mod beslutningen, særligt blandt arbejderklassen og de intellektuelle" FORBEDRING: Dette ville demonstrere bedre forståelse for de sociale klasser og magtstrukturer i perioden"
 
   VIGTIGT: Du skal svare i præcist dette JSON format, uden markdown eller kodeblokke:
   {
     "grade": "karakteren her (-3, 00, 02, 4, 7, 10 eller 12)",
     "reasoning": "detaljeret begrundelse her med reference til evalueringsområderne",
     "improvements": [
-      "Fagligt indhold: konkret forbedring med eksempel",
-      "Struktur: konkret forbedring med eksempel",
-      "Sprog: konkret forbedring med eksempel",
-      "Kritisk tænkning: konkret forbedring med eksempel",
-      "Praktisk anvendelse: konkret forbedring med eksempel",
-      "Yderligere specifikke forbedringspunkter..."
+      "Fagligt indhold: Upræcis brug af fagtermer [CITAT: "folk var sure over det der skete"] OMSKRIV TIL: "Der var udbredt utilfredshed i befolkningen, særligt blandt arbejderklassen" FORBEDRING: Dette ville vise bedre brug af fagsprog og sociologisk forståelse",
+      "Struktur: Uklar overgang mellem afsnit [CITAT: "Og så skete der også det at..."] OMSKRIV TIL: "Dette ledte til flere betydningsfulde konsekvenser. For det første..." FORBEDRING: Denne struktur ville skabe bedre flow og tydeligere progression",
+      "Sprog: Uformelt sprog [CITAT: "Det var ret dårligt"] OMSKRIV TIL: "Konsekvenserne var omfattende og primært negative" FORBEDRING: Dette giver en mere præcis og akademisk beskrivelse",
+      "Kritisk tænkning: Manglende nuancering [CITAT: "Dette var helt klart den eneste løsning"] OMSKRIV TIL: "Mens denne løsning havde flere fordele, kan man argumentere for at alternative tilgange også kunne have været effektive" FORBEDRING: Dette viser evne til at se flere perspektiver",
+      "Praktisk anvendelse: Manglende konkretisering [CITAT: "Dette ses stadig i dag"] OMSKRIV TIL: "Dette fænomen kan observeres i nutidens debat om klimapolitik, hvor..." FORBEDRING: Dette konkretiserer den historiske parallel"
     ],
     "strengths": [
-      "Fagligt indhold: konkret styrke med eksempel",
-      "Struktur: konkret styrke med eksempel",
-      "Sprog: konkret styrke med eksempel",
-      "Kritisk tænkning: konkret styrke med eksempel",
-      "Praktisk anvendelse: konkret styrke med eksempel",
-      "Yderligere specifikke styrker..."
+      "Fagligt indhold: God brug af kildemateriale",
+      "Struktur: Klar indledning",
+      "Sprog: Præcis formulering",
+      "Kritisk tænkning: God argumentation",
+      "Praktisk anvendelse: Relevant eksempel"
     ]
   }
 
   HUSK: 
-  1. Vær specifik og konkret i din feedback
-  2. Giv eksempler fra opgaven når muligt
-  3. Fokuser på både det faglige indhold og den metodiske tilgang
-  4. Vær konstruktiv i forbedringsforslag
-  5. Fremhæv både overordnede mønstre og specifikke detaljer
-  6. Bevar en professionel og objektiv tone
+  1. Vær MEGET specifik i forbedringsmulighederne
+  2. Alle forbedringsmuligheder SKAL følge det præcise format:
+     Kategori: Beskrivelse [CITAT: "citat"] OMSKRIV TIL: "forbedring" FORBEDRING: forklaring
+  3. Brug altid dobbelte anførselstegn (") omkring citater og forslag
+  4. Hold styrkerne korte og præcise
+  5. Fokuser på at give konstruktive og realistiske forbedringer
+  6. Brug fagsprog i dine forbedringsforslag
 `;

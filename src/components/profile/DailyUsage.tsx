@@ -16,17 +16,42 @@ export function DailyUsage({ userId }: DailyUsageProps) {
 
   const fetchDailyUsage = async () => {
     try {
-      const { data, error } = await supabase
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Try to get existing usage record
+      let { data, error } = await supabase
         .from('daily_evaluation_usage')
         .select('count')
         .eq('user_id', userId)
-        .eq('date', new Date().toISOString().split('T')[0])
+        .eq('date', today)
         .maybeSingle();
 
-      if (error) throw error;
-      setUsage(data?.count || 0);
+      if (error) {
+        console.error('Error fetching daily usage:', error);
+        return;
+      }
+
+      // If no record exists, create one
+      if (!data) {
+        const { error: insertError } = await supabase
+          .from('daily_evaluation_usage')
+          .insert({
+            user_id: userId,
+            date: today,
+            count: 0
+          });
+
+        if (insertError) {
+          console.error('Error creating usage record:', insertError);
+          return;
+        }
+
+        data = { count: 0 };
+      }
+
+      setUsage(data.count);
     } catch (error) {
-      console.error('Error fetching daily usage:', error);
+      console.error('Error in fetchDailyUsage:', error);
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +60,7 @@ export function DailyUsage({ userId }: DailyUsageProps) {
   useEffect(() => {
     fetchDailyUsage();
 
-    // Subscribe to realtime changes for the daily_evaluation_usage table
+    // Subscribe to realtime changes
     const channel = supabase
       .channel('daily_usage_changes')
       .on(

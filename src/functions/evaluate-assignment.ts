@@ -17,17 +17,44 @@ export const evaluateAssignment = async (
   instructionsText: string
 ): Promise<EvaluationResult> => {
   try {
-    // Get the current user's daily usage
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user?.id) {
+      throw new Error('User not authenticated');
+    }
+
+    // Get or create today's usage record
     const today = new Date().toISOString().split('T')[0];
-    const { data: usageData } = await supabase
+    let { data: usageData, error: usageError } = await supabase
       .from('daily_evaluation_usage')
       .select('count')
-      .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+      .eq('user_id', user.id)
       .eq('date', today)
       .maybeSingle();
 
-    const currentUsage = usageData?.count || 0;
-    if (currentUsage >= 5) {
+    if (usageError) {
+      console.error('Error checking usage:', usageError);
+      throw new Error('Could not check usage limit');
+    }
+
+    // If no usage record exists, create one
+    if (!usageData) {
+      const { error: insertError } = await supabase
+        .from('daily_evaluation_usage')
+        .insert({
+          user_id: user.id,
+          date: today,
+          count: 0
+        });
+
+      if (insertError) {
+        console.error('Error creating usage record:', insertError);
+        throw new Error('Could not initialize usage tracking');
+      }
+
+      usageData = { count: 0 };
+    }
+
+    if (usageData.count >= 5) {
       throw new Error('Du har nået din daglige grænse på 5 evalueringer');
     }
 
@@ -35,12 +62,10 @@ export const evaluateAssignment = async (
     let instructionsContent = instructionsText || '';
 
     if (assignmentFile) {
-      console.log('Processing assignment file:', assignmentFile.name);
       assignmentContent = await readFileContent(assignmentFile);
     }
 
     if (instructionsFile) {
-      console.log('Processing instructions file:', instructionsFile.name);
       instructionsContent = await readFileContent(instructionsFile);
     }
 
@@ -77,7 +102,7 @@ export const evaluateAssignment = async (
         reasoning: data.reasoning,
         improvements: data.improvements,
         strengths: data.strengths,
-        user_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: user.id
       });
 
     if (insertError) {

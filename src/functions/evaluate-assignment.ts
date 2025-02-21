@@ -22,40 +22,52 @@ export const evaluateAssignment = async (
       throw new Error('User not authenticated');
     }
 
-    // Get or create today's usage record
-    const today = new Date().toISOString().split('T')[0];
-    let { data: usageData, error: usageError } = await supabase
-      .from('daily_evaluation_usage')
-      .select('count')
+    // Check if user is admin
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
       .eq('user_id', user.id)
-      .eq('date', today)
+      .eq('role', 'admin')
       .maybeSingle();
 
-    if (usageError) {
-      console.error('Error checking usage:', usageError);
-      throw new Error('Could not check usage limit');
-    }
+    const isAdmin = !!roleData;
 
-    // If no usage record exists, create one
-    if (!usageData) {
-      const { error: insertError } = await supabase
+    if (!isAdmin) {
+      // Get or create today's usage record
+      const today = new Date().toISOString().split('T')[0];
+      let { data: usageData, error: usageError } = await supabase
         .from('daily_evaluation_usage')
-        .insert({
-          user_id: user.id,
-          date: today,
-          count: 0
-        });
+        .select('count')
+        .eq('user_id', user.id)
+        .eq('date', today)
+        .maybeSingle();
 
-      if (insertError) {
-        console.error('Error creating usage record:', insertError);
-        throw new Error('Could not initialize usage tracking');
+      if (usageError) {
+        console.error('Error checking usage:', usageError);
+        throw new Error('Could not check usage limit');
       }
 
-      usageData = { count: 0 };
-    }
+      // If no usage record exists, create one
+      if (!usageData) {
+        const { error: insertError } = await supabase
+          .from('daily_evaluation_usage')
+          .insert({
+            user_id: user.id,
+            date: today,
+            count: 0
+          });
 
-    if (usageData.count >= 5) {
-      throw new Error('Du har nået din daglige grænse på 5 evalueringer');
+        if (insertError) {
+          console.error('Error creating usage record:', insertError);
+          throw new Error('Could not initialize usage tracking');
+        }
+
+        usageData = { count: 0 };
+      }
+
+      if (usageData.count >= 5) {
+        throw new Error('Du har nået din daglige grænse på 5 evalueringer');
+      }
     }
 
     let assignmentContent = assignmentText || '';

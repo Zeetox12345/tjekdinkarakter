@@ -1,5 +1,5 @@
-import { FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import { FileText, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useState, useEffect } from "react";
@@ -32,6 +32,15 @@ const Index = () => {
   const [anonymousUsage, setAnonymousUsage] = useState<number>(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
+
+  const loadingMessages = [
+    "Analyserer din opgave grundigt...",
+    "Gennemgår argumentationsstruktur...",
+    "Evaluerer fagligt indhold...",
+    "Vurderer sproglig kvalitet...",
+    "Sammenligner med karakterskala...",
+  ];
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const checkUsage = async () => {
     try {
@@ -167,15 +176,24 @@ const Index = () => {
   const handleEvaluate = async () => {
     setIsLoading(true);
     setProgress(0);
+    
+    // Message rotation interval
+    const messageInterval = setInterval(() => {
+      setCurrentMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+
+    // Smooth progress animation
     const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 90) {
           clearInterval(progressInterval);
           return prev;
         }
-        return prev + 10;
+        // More natural progression
+        const increment = Math.max(1, Math.floor((90 - prev) / 10));
+        return Math.min(90, prev + increment);
       });
-    }, 1000);
+    }, 300);
     
     try {
       const result = await evaluateAssignment(assignmentFile, assignmentText, instructionsFile, instructionsText);
@@ -196,7 +214,9 @@ const Index = () => {
       });
     } finally {
       clearInterval(progressInterval);
+      clearInterval(messageInterval);
       setIsLoading(false);
+      setCurrentMessageIndex(0);
     }
   };
 
@@ -235,15 +255,49 @@ const Index = () => {
         />
 
         {isLoading && (
-          <div className="max-w-xl mx-auto mb-8">
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Analyserer din opgave...</h3>
-              <Progress value={progress} className="mb-2" />
-              <p className="text-sm text-gray-600 text-center">
-                Vores AI gennemgår din opgave grundigt
-              </p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-xl mx-auto mb-8"
+          >
+            <Card className="p-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 animate-pulse" />
+              <div className="relative">
+                <div className="flex items-center justify-center mb-4 space-x-3">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Loader2 className="w-6 h-6 text-primary" />
+                  </motion.div>
+                  <h3 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+                    Analyserer din opgave
+                  </h3>
+                </div>
+                
+                <div className="relative mb-4">
+                  <Progress value={progress} className="h-2" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+                    animate={{ x: ["0%", "100%"] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                  />
+                </div>
+
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentMessageIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-sm text-gray-600 text-center"
+                  >
+                    {loadingMessages[currentMessageIndex]}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
             </Card>
-          </div>
+          </motion.div>
         )}
 
         {evaluation && !isLoading && (

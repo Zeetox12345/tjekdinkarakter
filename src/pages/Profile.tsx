@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
@@ -25,6 +24,7 @@ export default function Profile() {
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
+            className="mt-8"
           >
             <ArrowLeft className="mr-2" />
             Tilbage til forsiden

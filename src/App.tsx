@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/AuthProvider";
 import { MainNav } from "@/components/MainNav";
 import { useAuth } from "@/components/AuthProvider";
-import { ThemeProvider } from "next-themes";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -45,17 +44,15 @@ const AppContent = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

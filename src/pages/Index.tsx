@@ -30,6 +30,7 @@ const Index = () => {
   const [progress, setProgress] = useState(0);
   const [dailyUsage, setDailyUsage] = useState<number>(0);
   const [anonymousUsage, setAnonymousUsage] = useState<number>(0);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
 
   const checkUsage = async () => {
@@ -91,7 +92,24 @@ const Index = () => {
     }
   };
 
+  // Add function to check admin status
+  const checkAdminStatus = async () => {
+    if (user?.id) {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (!error && data) {
+        setIsAdmin(true);
+      }
+    }
+  };
+
   useEffect(() => {
+    checkAdminStatus();
     checkUsage();
   }, [user]);
 
@@ -230,7 +248,7 @@ const Index = () => {
 
         {evaluation && !isLoading && (
           <div className="max-w-4xl mx-auto mb-8">
-            <EvaluationResult evaluation={evaluation} isPremium={false} />
+            <EvaluationResult evaluation={evaluation} isPremium={isAdmin} />
           </div>
         )}
 

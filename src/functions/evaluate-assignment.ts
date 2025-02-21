@@ -17,34 +17,39 @@ export const evaluateAssignment = async (
   instructionsText: string
 ): Promise<EvaluationResult> => {
   try {
+    // Get the current user's daily usage
+    const today = new Date().toISOString().split('T')[0];
+    const { data: usageData } = await supabase
+      .from('daily_evaluation_usage')
+      .select('count')
+      .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+      .eq('date', today)
+      .maybeSingle();
+
+    const currentUsage = usageData?.count || 0;
+    if (currentUsage >= 5) {
+      throw new Error('Du har nået din daglige grænse på 5 evalueringer');
+    }
+
     let assignmentContent = assignmentText || '';
     let instructionsContent = instructionsText || '';
 
-    // Handle file content if files are provided
     if (assignmentFile) {
-      console.log('Processing assignment file:', assignmentFile.name, assignmentFile.type);
+      console.log('Processing assignment file:', assignmentFile.name);
       assignmentContent = await readFileContent(assignmentFile);
-      console.log('Successfully processed assignment file, content length:', assignmentContent.length);
     }
 
     if (instructionsFile) {
-      console.log('Processing instructions file:', instructionsFile.name, instructionsFile.type);
+      console.log('Processing instructions file:', instructionsFile.name);
       instructionsContent = await readFileContent(instructionsFile);
-      console.log('Successfully processed instructions file, content length:', instructionsContent.length);
     }
 
-    // Validate content before sending to API
     if (!assignmentContent.trim()) {
       throw new Error('No content found in assignment');
     }
 
-    // Clean and truncate content if needed
     assignmentContent = cleanContent(assignmentContent);
     instructionsContent = cleanContent(instructionsContent);
-
-    // Log content sizes before sending
-    console.log('Final assignment content length:', assignmentContent.length);
-    console.log('Final instructions content length:', instructionsContent.length);
 
     const { data, error } = await supabase.functions.invoke('evaluate-assignment', {
       body: {
@@ -62,7 +67,7 @@ export const evaluateAssignment = async (
       throw new Error('No evaluation data received');
     }
 
-    // After successful evaluation, insert into evaluations table which triggers the daily usage counter
+    // Insert the evaluation which will trigger the daily usage increment
     const { error: insertError } = await supabase
       .from('evaluations')
       .insert({
@@ -72,10 +77,12 @@ export const evaluateAssignment = async (
         reasoning: data.reasoning,
         improvements: data.improvements,
         strengths: data.strengths,
+        user_id: (await supabase.auth.getUser()).data.user?.id
       });
 
     if (insertError) {
       console.error('Error inserting evaluation:', insertError);
+      throw new Error('Failed to save evaluation');
     }
 
     return data;

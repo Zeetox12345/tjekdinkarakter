@@ -12,28 +12,49 @@ interface DailyUsageProps {
 export function DailyUsage({ userId }: DailyUsageProps) {
   const [usage, setUsage] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
-  const MAX_DAILY_USES = 5; // Updated to 5 uses per day
+  const MAX_DAILY_USES = 5;
+
+  const fetchDailyUsage = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('daily_evaluation_usage')
+        .select('count')
+        .eq('user_id', userId)
+        .eq('date', new Date().toISOString().split('T')[0])
+        .maybeSingle();
+
+      if (error) throw error;
+      setUsage(data?.count || 0);
+    } catch (error) {
+      console.error('Error fetching daily usage:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchDailyUsage() {
-      try {
-        const { data, error } = await supabase
-          .from('daily_evaluation_usage')
-          .select('count')
-          .eq('user_id', userId)
-          .eq('date', new Date().toISOString().split('T')[0])
-          .maybeSingle();
-
-        if (error) throw error;
-        setUsage(data?.count || 0);
-      } catch (error) {
-        console.error('Error fetching daily usage:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     fetchDailyUsage();
+
+    // Subscribe to realtime changes for the daily_evaluation_usage table
+    const channel = supabase
+      .channel('daily_usage_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'daily_evaluation_usage',
+          filter: `user_id=eq.${userId}`
+        },
+        () => {
+          fetchDailyUsage();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId]);
 
   const remainingUses = Math.max(0, MAX_DAILY_USES - usage);

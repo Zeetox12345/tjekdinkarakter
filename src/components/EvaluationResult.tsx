@@ -330,6 +330,53 @@ const EvaluationResult = ({ evaluation, isPremium = false }: EvaluationResultPro
                 </h4>
               </div>
               <div className="relative">
+                {/* Summary bullet points */}
+                <div className="mb-6 bg-blue-50/50 rounded-lg p-4">
+                  <h5 className="font-medium text-blue-600 mb-3">Dine næste skridt:</h5>
+                  <ul className="space-y-2">
+                    {Object.entries(categorizedImprovements).slice(0, 5).map(([category, items], index) => {
+                      if (!items[0]) return null;
+                      
+                      // Extract the improvement suggestion from the text
+                      const text = items[0];
+                      const citationMatch = text.match(/\[CITAT:.*?\]/);
+                      const improvementMatch = text.match(/OMSKRIV TIL: "(.*?)"/);
+                      
+                      // Create action-oriented text based on the category
+                      const getActionText = (category: string, description: string, fullText: string) => {
+                        // For fagligt indhold, extract the suggested terms from OMSKRIV TIL
+                        if (category === "Fagligt indhold") {
+                          const omskrivMatch = fullText.match(/OMSKRIV TIL: "(.*?)"/);
+                          if (omskrivMatch && omskrivMatch[1]) {
+                            const forbedring = fullText.match(/FORBEDRING: (.*?)(?:\[|$)/);
+                            const forbedringText = forbedring ? forbedring[1].trim() : '';
+                            return `Styrk din faglige argumentation: Brug disse fagbegreber i din tekst: "${omskrivMatch[1]}". ${forbedringText}`;
+                          }
+                        }
+                        
+                        const actionMap: Record<string, string> = {
+                          "Fagligt indhold": "Styrk din faglige argumentation: Definer og forklar de centrale begreber, og brug dem aktivt i din analyse",
+                          "Struktur": "Forbedre strukturen: Start hvert afsnit med en klar hovedpointe, og brug overgangsord som 'derfor', 'desuden' og 'imidlertid'",
+                          "Sprog": "Løft sproget: Erstat hverdagsudtryk med akademiske formuleringer. F.eks. 'dette medfører' i stedet for 'det gør at'",
+                          "Kritisk tænkning": "Nuancér analysen: Præsentér både fordele og ulemper ved dine argumenter. Brug 'på den ene side... på den anden side'",
+                          "Praktisk anvendelse": "Konkretisér: Giv specifikke eksempler fra praksis, og forklar hvordan teorien kan anvendes i virkeligheden"
+                        };
+                        
+                        return actionMap[category] || "Forbedre dette punkt";
+                      };
+                      
+                      // Get the base description without category prefix
+                      const baseDescription = text.split('[CITAT:')[0].replace(`${category}: `, '');
+                      
+                      return (
+                        <li key={index} className="flex items-start space-x-2">
+                          <span className="text-blue-500 mt-1 shrink-0">→</span>
+                          <span className="text-gray-700">{getActionText(category, baseDescription, text)}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
                 <div className="space-y-6">
                   {Object.entries(categorizedImprovements).map(([category, items], categoryIndex) => (
                     <motion.div

@@ -1,9 +1,22 @@
-
+// @deno-types="https://deno.land/std@0.168.0/http/server.d.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// @deno-types="https://esm.sh/@supabase/supabase-js@2/dist/module/index.d.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { sanitizeText } from './text-utils.ts'
 import { getOpenAIEvaluation } from './openai.ts'
 import type { EvaluationRequest, SanitizedEvaluation } from './types.ts'
+
+// Add Deno namespace declaration for TypeScript
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+};
+
+// Add EdgeRuntime declaration for TypeScript
+declare const EdgeRuntime: {
+  waitUntil(promise: Promise<any>): void;
+};
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,54 +35,68 @@ serve(async (req) => {
       throw new Error('No assignment text provided');
     }
 
-    const maxLength = 10000;
+    // Increase max length to accommodate more complex analysis
+    const maxLength = 15000;
     const sanitizedAssignmentText = sanitizeText(assignmentText).slice(0, maxLength);
     const sanitizedInstructionsText = instructionsText ? 
       sanitizeText(instructionsText).slice(0, maxLength) : '';
 
-    const evaluation = await getOpenAIEvaluation(
-      sanitizedAssignmentText,
-      sanitizedInstructionsText
-    );
+    // Set a longer timeout for the API call (GPT-o1 may take longer to process)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
-    const supabase = createClient(supabaseUrl!, supabaseKey!);
+    try {
+      const evaluation = await getOpenAIEvaluation(
+        sanitizedAssignmentText,
+        sanitizedInstructionsText
+      );
+      clearTimeout(timeoutId);
 
-    // Store the evaluation in background
-    EdgeRuntime.waitUntil((async () => {
-      try {
-        const sanitizedEvaluation: SanitizedEvaluation = {
-          assignment_text: sanitizedAssignmentText,
-          instructions_text: sanitizedInstructionsText,
-          grade: sanitizeText(evaluation.grade),
-          reasoning: sanitizeText(evaluation.reasoning),
-          improvements: evaluation.improvements.map(sanitizeText),
-          strengths: evaluation.strengths.map(sanitizeText)
-        };
+      // Initialize Supabase client
+      const supabaseUrl = Deno.env.get('SUPABASE_URL');
+      const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+      const supabase = createClient(supabaseUrl!, supabaseKey!);
 
-        await supabase
-          .from('evaluations')
-          .insert(sanitizedEvaluation);
-      } catch (dbError) {
-        console.error('Database Error:', dbError);
-      }
-    })());
+      // Store the evaluation in background
+      EdgeRuntime.waitUntil((async () => {
+        try {
+          const sanitizedEvaluation: SanitizedEvaluation = {
+            assignment_text: sanitizedAssignmentText,
+            instructions_text: sanitizedInstructionsText,
+            grade: sanitizeText(evaluation.grade),
+            reasoning: sanitizeText(evaluation.reasoning),
+            improvements: evaluation.improvements.map(sanitizeText),
+            strengths: evaluation.strengths.map(sanitizeText)
+          };
 
-    return new Response(
-      JSON.stringify(evaluation),
-      { 
-        headers: { 
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        } 
-      }
-    );
+          await supabase
+            .from('evaluations')
+            .insert(sanitizedEvaluation);
+        } catch (dbError) {
+          console.error('Database Error:', dbError);
+        }
+      })());
+
+      return new Response(
+        JSON.stringify(evaluation),
+        { 
+          headers: { 
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          } 
+        }
+      );
+    } catch (apiError) {
+      clearTimeout(timeoutId);
+      throw apiError;
+    }
   } catch (error) {
     console.error('Error in evaluate-assignment function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        message: 'Failed to evaluate assignment. This may be due to the complexity of the text or a timeout.'
+      }),
       { 
         status: 500,
         headers: { 

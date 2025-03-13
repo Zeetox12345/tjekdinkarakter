@@ -91,37 +91,37 @@ const gradeColors: Record<string, { bg: string; text: string; description: strin
   "12": { 
     bg: "bg-green-500", 
     text: "text-green-500",
-    description: "Fremragende præstation der demonstrerer udtømmende opfyldelse af fagets mål med ingen eller få uvæsentlige mangler."
+    description: "Fremragende prÃ¦station der demonstrerer udtÃ¸mmende opfyldelse af fagets mÃ¥l med ingen eller fÃ¥ uvÃ¦sentlige mangler."
   },
   "10": { 
     bg: "bg-emerald-500", 
     text: "text-emerald-500",
-    description: "Fortrinlig præstation der demonstrerer omfattende opfyldelse af fagets mål med nogle mindre væsentlige mangler."
+    description: "Fortrinlig prÃ¦station der demonstrerer omfattende opfyldelse af fagets mÃ¥l med nogle mindre vÃ¦sentlige mangler."
   },
   "7": { 
     bg: "bg-blue-500", 
     text: "text-blue-500",
-    description: "God præstation der demonstrerer opfyldelse af fagets mål med en del mangler."
+    description: "God prÃ¦station der demonstrerer opfyldelse af fagets mÃ¥l med en del mangler."
   },
   "4": { 
     bg: "bg-yellow-500", 
     text: "text-yellow-500",
-    description: "Jævn præstation der demonstrerer en mindre grad af opfyldelse af fagets mål med adskillige væsentlige mangler."
+    description: "JÃ¦vn prÃ¦station der demonstrerer en mindre grad af opfyldelse af fagets mÃ¥l med adskillige vÃ¦sentlige mangler."
   },
   "02": { 
     bg: "bg-orange-500", 
     text: "text-orange-500",
-    description: "Tilstrækkelig præstation der demonstrerer den minimalt acceptable grad af opfyldelse af fagets mål."
+    description: "TilstrÃ¦kkelig prÃ¦station der demonstrerer den minimalt acceptable grad af opfyldelse af fagets mÃ¥l."
   },
   "00": { 
     bg: "bg-red-500", 
     text: "text-red-500",
-    description: "Utilstrækkelig præstation der ikke demonstrerer en acceptabel grad af opfyldelse af fagets mål."
+    description: "UtilstrÃ¦kkelig prÃ¦station der ikke demonstrerer en acceptabel grad af opfyldelse af fagets mÃ¥l."
   },
   "-3": { 
     bg: "bg-red-700", 
     text: "text-red-700",
-    description: "Den ringe præstation der er helt uacceptabel."
+    description: "Den ringe prÃ¦station der er helt uacceptabel."
   },
 };
 
@@ -131,35 +131,35 @@ const feedbackCategories: Record<string, FeedbackCategory> = {
     color: "text-purple-500",
     bgColor: "bg-purple-50",
     title: "Fagligt indhold",
-    description: "Brug af fagbegreber, teoretisk forståelse, dybde i analysen og relevans af argumenter."
+    description: "Brug af fagbegreber, teoretisk forstÃ¥else, dybde i analysen og relevans af argumenter."
   },
   "Struktur": {
     icon: Layout,
     color: "text-blue-500",
     bgColor: "bg-blue-50",
     title: "Struktur",
-    description: "Opgavens opbygning, metodisk tilgang, sammenhæng mellem afsnit og rød tråd i argumentationen."
+    description: "Opgavens opbygning, metodisk tilgang, sammenhÃ¦ng mellem afsnit og rÃ¸d trÃ¥d i argumentationen."
   },
   "Sprog": {
     icon: MessageSquare,
     color: "text-green-500",
     bgColor: "bg-green-50",
     title: "Sprog",
-    description: "Akademisk sprogbrug, præcision i formuleringer, læsevenlighed og korrekt citering."
+    description: "Akademisk sprogbrug, prÃ¦cision i formuleringer, lÃ¦sevenlighed og korrekt citering."
   },
-  "Kritisk tænkning": {
+  "Kritisk tÃ¦nkning": {
     icon: Brain,
     color: "text-amber-500",
     bgColor: "bg-amber-50",
-    title: "Kritisk tænkning",
-    description: "Diskussion af forskellige perspektiver, selvstændig analyse og nuanceret argumentation."
+    title: "Kritisk tÃ¦nkning",
+    description: "Diskussion af forskellige perspektiver, selvstÃ¦ndig analyse og nuanceret argumentation."
   },
   "Praktisk anvendelse": {
     icon: Lightbulb,
     color: "text-rose-500",
     bgColor: "bg-rose-50",
     title: "Praktisk anvendelse",
-    description: "Kobling mellem teori og praksis, relevante eksempler og virkelighedsnær anvendelse."
+    description: "Kobling mellem teori og praksis, relevante eksempler og virkelighedsnÃ¦r anvendelse."
   },
 };
 
@@ -399,7 +399,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
                   }}
                 >
                   <Clipboard className="w-4 h-4 mr-2" />
-                  Kopiér {parsed.suggestions.length > 1 ? 'alle forslag' : 'forslag'}
+                  KopiÃ©r {parsed.suggestions.length > 1 ? 'alle forslag' : 'forslag'}
                 </Button>
               </div>
             </div>
@@ -445,7 +445,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
       // Adjust based on category importance
       const categoryImportance: Record<string, number> = {
         "Fagligt indhold": 1.2,
-        "Kritisk tænkning": 1.1,
+        "Kritisk tÃ¦nkning": 1.1,
         "Struktur": 1.0,
         "Sprog": 0.9,
         "Praktisk anvendelse": 0.8,
@@ -502,13 +502,13 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           
           // Create variations for different parts of the feedback
           const descriptionVariations = [
-            "Forbedre", "Styrk", "Udvikle", "Nuancér", "Præcisér", 
-            "Uddyb", "Tydeliggør", "Fokusér på", "Arbejd med"
+            "Forbedre", "Styrk", "Udvikle", "NuancÃ©r", "PrÃ¦cisÃ©r", 
+            "Uddyb", "TydeliggÃ¸r", "FokusÃ©r pÃ¥", "Arbejd med"
           ];
           
           const topicVariations = [
             "argumentation", "analyse", "struktur", "formuleringer", "eksempler",
-            "fagbegreber", "perspektiver", "sammenhæng", "præcision", "detaljer"
+            "fagbegreber", "perspektiver", "sammenhÃ¦ng", "prÃ¦cision", "detaljer"
           ];
           
           // Create a unique description
@@ -522,19 +522,19 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           
           // Create suggestions for each citation
           const suggestionPrefixes = [
-            "Prøv at", "Overvej at", "Det vil styrke din opgave at", 
+            "PrÃ¸v at", "Overvej at", "Det vil styrke din opgave at", 
             "Du kan med fordel", "En god strategi er at"
           ];
           
           const suggestionActions = [
             "uddybe dine pointer med flere eksempler",
-            "præcisere dine formuleringer med fagbegreber",
-            "skabe bedre sammenhæng mellem dine argumenter",
+            "prÃ¦cisere dine formuleringer med fagbegreber",
+            "skabe bedre sammenhÃ¦ng mellem dine argumenter",
             "nuancere din analyse med flere perspektiver",
             "strukturere dine afsnit mere logisk",
-            "underbygge dine påstande med kilder",
-            "tydeliggøre din røde tråd gennem afsnittet",
-            "fokusere din diskussion på de centrale aspekter"
+            "underbygge dine pÃ¥stande med kilder",
+            "tydeliggÃ¸re din rÃ¸de trÃ¥d gennem afsnittet",
+            "fokusere din diskussion pÃ¥ de centrale aspekter"
           ];
           
           // Create multiple citations and suggestions
@@ -554,18 +554,18 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           
           // Create a unique explanation
           const explanationPrefixes = [
-            "Dette vil", "Denne ændring vil", "Det hjælper med at", 
+            "Dette vil", "Denne Ã¦ndring vil", "Det hjÃ¦lper med at", 
             "Dette styrker", "Denne forbedring vil"
           ];
           
           const explanationEffects = [
-            "løfte det faglige niveau i din opgave",
-            "gøre din argumentation mere overbevisende",
-            "vise en dybere forståelse af emnet",
-            "styrke den røde tråd i din opgave",
-            "demonstrere kritisk tænkning",
-            "øge præcisionen i din analyse",
-            "forbedre læsevenligheden af din tekst",
+            "lÃ¸fte det faglige niveau i din opgave",
+            "gÃ¸re din argumentation mere overbevisende",
+            "vise en dybere forstÃ¥else af emnet",
+            "styrke den rÃ¸de trÃ¥d i din opgave",
+            "demonstrere kritisk tÃ¦nkning",
+            "Ã¸ge prÃ¦cisionen i din analyse",
+            "forbedre lÃ¦sevenligheden af din tekst",
             "vise akademisk modenhed i din tilgang"
           ];
           
@@ -601,19 +601,19 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
         
         for (let j = 0; j < additionalCount; j++) {
           const suggestionPrefixes = [
-            "Prøv at", "Overvej at", "Det vil styrke din opgave at", 
+            "PrÃ¸v at", "Overvej at", "Det vil styrke din opgave at", 
             "Du kan med fordel", "En god strategi er at"
           ];
           
           const suggestionActions = [
             "uddybe dine pointer med flere eksempler",
-            "præcisere dine formuleringer med fagbegreber",
-            "skabe bedre sammenhæng mellem dine argumenter",
+            "prÃ¦cisere dine formuleringer med fagbegreber",
+            "skabe bedre sammenhÃ¦ng mellem dine argumenter",
             "nuancere din analyse med flere perspektiver",
             "strukturere dine afsnit mere logisk",
-            "underbygge dine påstande med kilder",
-            "tydeliggøre din røde tråd gennem afsnittet",
-            "fokusere din diskussion på de centrale aspekter"
+            "underbygge dine pÃ¥stande med kilder",
+            "tydeliggÃ¸re din rÃ¸de trÃ¥d gennem afsnittet",
+            "fokusere din diskussion pÃ¥ de centrale aspekter"
           ];
           
           const suggestionPrefix = suggestionPrefixes[Math.floor(Math.random() * suggestionPrefixes.length)];
@@ -668,7 +668,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
       // Prioritize by category importance for academic writing
       const categoryPriority: Record<string, number> = {
         "Fagligt indhold": 5,
-        "Kritisk tænkning": 4,
+        "Kritisk tÃ¦nkning": 4,
         "Struktur": 3,
         "Sprog": 2,
         "Praktisk anvendelse": 1
@@ -685,9 +685,9 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
         const actionMap: Record<string, string> = {
           "Fagligt indhold": `Styrk din brug af fagbegreber: ${improvement.suggestions[0] || ''}`,
           "Struktur": `Forbedre strukturen: ${improvement.suggestions[0] || ''}`,
-          "Sprog": `Løft dit sprog: ${improvement.suggestions[0] || ''}`,
-          "Kritisk tænkning": `Nuancér din analyse: ${improvement.suggestions[0] || ''}`,
-          "Praktisk anvendelse": `Konkretisér med eksempler: ${improvement.suggestions[0] || ''}`
+          "Sprog": `LÃ¸ft dit sprog: ${improvement.suggestions[0] || ''}`,
+          "Kritisk tÃ¦nkning": `NuancÃ©r din analyse: ${improvement.suggestions[0] || ''}`,
+          "Praktisk anvendelse": `KonkretisÃ©r med eksempler: ${improvement.suggestions[0] || ''}`
         };
         
         return actionMap[improvement.category] || improvement.suggestions[0] || '';
@@ -783,12 +783,12 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           explanation = isCorrect 
             ? "Korrekt svar!" 
             : partiallyCorrect 
-              ? "Næsten korrekt. Der kan være en lille afrundingsfejl." 
+              ? "NÃ¦sten korrekt. Der kan vÃ¦re en lille afrundingsfejl." 
               : `Ikke korrekt. Det rigtige svar er ${questionData.correctAnswer}.`;
           
           predictedGrade = isCorrect ? "12" : partiallyCorrect ? "7" : "00";
         } catch (error) {
-          explanation = "Der opstod en fejl ved evaluering af dette matematikspørgsmål.";
+          explanation = "Der opstod en fejl ved evaluering af dette matematikspÃ¸rgsmÃ¥l.";
           predictedGrade = "00";
         }
         break;
@@ -845,7 +845,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           
           if (matchRatio >= 0.8) {
             partiallyCorrect = true;
-            explanation = "Dit svar indeholder de vigtigste nøgleord, men er ikke helt præcist.";
+            explanation = "Dit svar indeholder de vigtigste nÃ¸gleord, men er ikke helt prÃ¦cist.";
             predictedGrade = "10";
           } else if (matchRatio >= 0.5) {
             partiallyCorrect = true;
@@ -853,7 +853,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
             predictedGrade = "7";
           } else if (matchRatio >= 0.3) {
             partiallyCorrect = true;
-            explanation = "Dit svar er delvist korrekt, men mangler væsentlige elementer.";
+            explanation = "Dit svar er delvist korrekt, men mangler vÃ¦sentlige elementer.";
             predictedGrade = "4";
           } else {
             explanation = "Dit svar matcher ikke det forventede svar.";
@@ -863,7 +863,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
         break;
         
       default:
-        explanation = "Ukendt spørgsmålstype";
+        explanation = "Ukendt spÃ¸rgsmÃ¥lstype";
         predictedGrade = "00";
     }
 
@@ -920,7 +920,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
     // Map our feedback categories to rubric categories
     const categoryMapping: Record<string, string> = {
       "Fagligt indhold": "Content",
-      "Kritisk tænkning": "Analysis",
+      "Kritisk tÃ¦nkning": "Analysis",
       "Struktur": "Structure",
       "Sprog": "Language",
       "Praktisk anvendelse": "Content"
@@ -952,37 +952,15 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           // Calculate a base score that's weighted by the ratio of strengths
           let score = 0;
           if (totalCount > 0) {
-            // IMPROVEMENT: Even more generous scoring formula with stronger bias toward strengths
-            const strengthRatio = strengthsCount / totalCount;
-            // Amplify the strength ratio with a power function to boost higher ratios more
-            const amplifiedRatio = Math.pow(strengthRatio, 0.7); // Power less than 1 boosts lower values more
-            score = (amplifiedRatio * 2.0) * rubricScores[rubric].maxScore; // Increased multiplier from 1.5 to 2.0
-            
-            // Significantly higher minimum score floor - no grade should be below 50%
-            score = Math.max(score, rubricScores[rubric].maxScore * 0.5);
+            score = (strengthsCount / totalCount) * rubricScores[rubric].maxScore;
           } else {
-            // If no feedback in this category, assume above middle score
-            score = (rubricScores[rubric].maxScore * 0.7); // Increased from 0.6 to 0.7
+            // If no feedback in this category, assume middle score
+            score = rubricScores[rubric].maxScore / 2;
           }
           
           // Apply further adjustments based on the quality and count of feedback
-          if (strengthsCount > 3) score += 2.0; // Increased bonus for many strengths
-          if (strengthsCount > 0) score += 1.5; // Increased base bonus for having strengths
-          
-          // CRITICAL IMPROVEMENT: For cases with more strengths than improvements, 
-          // give an additional significant bonus
-          if (strengthsCount > improvementsCount) {
-            score += (strengthsCount - improvementsCount) * 0.8; // Bonus based on strength advantage
-          }
-          
-          // Greatly reduced penalty for improvements
-          if (improvementsCount > 5) score -= 0.3; // Further reduced from 0.5
-          
-          // Apply additional score boost based on assignment features
-          if (assignment?.wordCount) {
-            if (assignment.wordCount > 1000) score += 0.8; // Increased bonus for longer assignments
-            if (assignment.wordCount > 2000) score += 0.5; // Additional bonus for very long assignments
-          }
+          if (strengthsCount > 3) score += 1; // Bonus for many strengths
+          if (improvementsCount > 5) score -= 1; // Penalty for many improvements needed
           
           // Ensure score is within range
           score = Math.max(0, Math.min(score, rubricScores[rubric].maxScore));
@@ -1004,61 +982,15 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
     // Normalize the score to account for weight sum not equaling 1
     const normalizedScore = weightSum > 0 ? weightedTotal / weightSum : 0;
     
-    // NEW: Pre-adjustment boost for specific score ranges that are typically underrated
-    let adjustedNormalizedScore = normalizedScore;
-    // Apply targeted boost to mid-high range scores which are most prone to underprediction
-    if (normalizedScore >= 3.5 && normalizedScore <= 6.5) {
-      // These are scores that often correspond to real grades of 7-10 but get predicted too low
-      adjustedNormalizedScore += (6.5 - normalizedScore) * 0.3; // Larger boost for lower scores in this range
-    }
-    
-    // Apply a more aggressive general boost to all normalized scores
-    const boostFactor = 1.8; // Significantly increased from 1.5
-    const boostedScore = Math.min(10, adjustedNormalizedScore * boostFactor);
-    
-    // Apply a more aggressive non-linear curve
-    const curvedScore = applyCurve(boostedScore);
-    
-    // Define grade values array for threshold and range calculations
-    const gradeValues = ["-3", "00", "02", "4", "7", "10", "12"];
-    
     // Scale to Danish 7-step scale (-3, 00, 02, 4, 7, 10, 12)
-    // Dramatically reduced thresholds to ensure high real-world grades get appropriate predictions
     let predictedGrade: string;
-    if (curvedScore >= 6.0) predictedGrade = "12";      // Was 7.0
-    else if (curvedScore >= 4.5) predictedGrade = "10"; // Was 5.5
-    else if (curvedScore >= 3.5) predictedGrade = "7";  // Was 4.0
-    else if (curvedScore >= 2.0) predictedGrade = "4";  // Was 2.5
-    else if (curvedScore >= 1.0) predictedGrade = "02"; // Was 1.5
-    else if (curvedScore >= 0.5) predictedGrade = "00"; // Unchanged
+    if (normalizedScore >= 9.5) predictedGrade = "12";
+    else if (normalizedScore >= 8.0) predictedGrade = "10";
+    else if (normalizedScore >= 6.5) predictedGrade = "7";
+    else if (normalizedScore >= 5.0) predictedGrade = "4";
+    else if (normalizedScore >= 3.0) predictedGrade = "02";
+    else if (normalizedScore >= 1.0) predictedGrade = "00";
     else predictedGrade = "-3";
-    
-    // NEW: Special adjustment for high-strength assignments
-    // If the assignment has significantly more strengths than improvements, bump the grade
-    const totalStrengths = Object.values(categorizedStrengths).reduce((sum, items) => sum + items.length, 0);
-    const totalImprovements = Object.values(categorizedImprovements).reduce((sum, items) => sum + items.length, 0);
-    
-    if (totalStrengths > totalImprovements * 1.5) {
-      // If strengths significantly outweigh improvements, this is likely a high-quality assignment
-      // Find the current grade index and consider bumping it up
-      const currentGradeIndex = gradeValues.indexOf(predictedGrade);
-      if (currentGradeIndex < gradeValues.length - 1) {
-        // Bump by one grade level
-        predictedGrade = gradeValues[currentGradeIndex + 1];
-      }
-    }
-    
-    // Wider borderline margin for upgrading grades
-    const gradeThresholds = [0.5, 1.0, 2.0, 3.5, 4.5, 6.0];
-    const currentGradeIndex = gradeValues.indexOf(predictedGrade);
-    if (currentGradeIndex < gradeValues.length - 1) {
-      const nextThreshold = gradeThresholds[currentGradeIndex + 1];
-      const borderlineMargin = 0.6; // Increased from 0.4 to 0.6
-      if (nextThreshold && curvedScore >= (nextThreshold - borderlineMargin)) {
-        // Bump up to the next grade if within the borderline margin
-        predictedGrade = gradeValues[currentGradeIndex + 1];
-      }
-    }
     
     // Calculate confidence based on amount and consistency of feedback
     const totalFeedbackItems = evaluation.strengths.length + evaluation.improvements.length;
@@ -1075,6 +1007,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
     
     // Define grade range based on confidence
     // Convert grades to numbers for calculating range
+    const gradeValues = ["-3", "00", "02", "4", "7", "10", "12"];
     const currentIndex = gradeValues.indexOf(predictedGrade);
     
     let minIndex = currentIndex;
@@ -1097,25 +1030,6 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
       },
       rubricScores
     };
-  };
-  
-  // IMPROVEMENT: Helper function to apply a more aggressive non-linear curve to scores
-  const applyCurve = (score: number): number => {
-    // Curve parameters - more aggressive curve parameters
-    const a = 1.5; // Controls steepness - increased from 1.2
-    const b = 0.9; // Controls midpoint shift - increased from 0.7
-    
-    // Apply sigmoid-inspired curve: score + a*score*(1-score/10)*b
-    // This boosts mid-range scores more than extremes
-    const boost = a * score * (1 - score / 10) * b;
-    
-    // Apply additional fixed boost for mid-range scores (3-7 range)
-    let additionalBoost = 0;
-    if (score >= 3 && score <= 7) {
-      additionalBoost = 0.7; // Fixed boost for mid-range scores
-    }
-    
-    return Math.min(10, score + boost + additionalBoost);
   };
   
   const gradePrediction = calculateGradePrediction();
@@ -1236,6 +1150,24 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
                   <div className="ml-4">
                     <h3 className="text-xl font-semibold text-gray-900">Din karakter</h3>
                     <p className={cn("text-sm font-medium", gradeColor.text)}>{gradeColor.description}</p>
+                    
+                    {/* Grade prediction accuracy */}
+                    <div className="mt-2 flex items-center">
+                      <div className={cn(
+                        "h-2 w-2 rounded-full mr-2",
+                        gradeMatchAccuracy === 100 ? "bg-green-500" : 
+                        gradeMatchAccuracy === 75 ? "bg-yellow-500" : "bg-red-500"
+                      )} />
+                      <p className="text-xs text-gray-500">
+                        {gradePrediction.isAutomaticallyGraded 
+                          ? "Automatisk bedÃ¸mmelse"
+                          : gradeMatchAccuracy === 100 
+                            ? "Forudsigelse: 100% nÃ¸jagtig" 
+                            : gradeMatchAccuracy === 75 
+                              ? `Forudsigelse: inden for rÃ¦kkevidde (${gradePrediction.range.min}-${gradePrediction.range.max})` 
+                              : "Forudsigelse: uden for rÃ¦kkevidde"}
+                      </p>
+                    </div>
                   </div>
                 </div>
                 <div className="w-full md:w-1/2">
@@ -1279,7 +1211,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
           <Card className="p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               <Target className="w-5 h-5 mr-2 text-gray-500" />
-              Dine næste skridt
+              Dine nÃ¦ste skridt
             </h3>
             <div className="space-y-4">
               {nextSteps.map((step, index) => {
@@ -1546,7 +1478,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
                                         }}
                                       >
                                         <Clipboard className="w-4 h-4 mr-2" />
-                                        Kopiér {parseImprovement(improvement).suggestions.length > 1 ? 'alle forslag' : 'forslag'}
+                                        KopiÃ©r {parseImprovement(improvement).suggestions.length > 1 ? 'alle forslag' : 'forslag'}
                                       </Button>
                                     </div>
                                   </div>
@@ -1579,7 +1511,7 @@ const EvaluationResult = ({ evaluation, isPremium = false, assignment }: Evaluat
         <div className="text-center">
           <Button className="w-full sm:w-auto" variant="default">
             <Lock className="mr-2 h-4 w-4" />
-            Opgrader til Premium - 79 kr./måned
+            Opgrader til Premium - 79 kr./mÃ¥ned
           </Button>
         </div>
       )}

@@ -1,7 +1,13 @@
-
 import { EvaluationResult } from './types.ts';
 import { cleanJsonContent } from './text-utils.ts';
 import { getSystemPrompt, getEvaluationPrompt } from './prompts.ts';
+
+// Add Deno namespace declaration for TypeScript
+declare const Deno: {
+  env: {
+    get(key: string): string | undefined;
+  };
+};
 
 export async function getOpenAIEvaluation(
   assignmentText: string,
@@ -19,7 +25,7 @@ export async function getOpenAIEvaluation(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'gpt-o1',
       messages: [
         { 
           role: 'system', 
@@ -31,7 +37,8 @@ export async function getOpenAIEvaluation(
         }
       ],
       temperature: 0.7,
-      max_tokens: 1000,
+      max_tokens: 1500,
+      response_format: { type: "json_object" },
     }),
   });
 

@@ -4,7 +4,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { sanitizeText } from './text-utils.ts'
 import { getOpenAIEvaluation } from './openai.ts'
-import type { EvaluationRequest, SanitizedEvaluation } from './types.ts'
+import type { EvaluationRequest, SanitizedEvaluation, EvaluationResult } from './types.ts'
 
 // Add Deno namespace declaration for TypeScript
 declare const Deno: {
@@ -35,15 +35,15 @@ serve(async (req) => {
       throw new Error('No assignment text provided');
     }
 
-    // Increase max length to accommodate more complex analysis
-    const maxLength = 15000;
+    // Set max length for the model's context window
+    const maxLength = 12000; // Increased for GPT-4
     const sanitizedAssignmentText = sanitizeText(assignmentText).slice(0, maxLength);
     const sanitizedInstructionsText = instructionsText ? 
       sanitizeText(instructionsText).slice(0, maxLength) : '';
 
-    // Set a longer timeout for the API call (GPT-o1 may take longer to process)
+    // Set a timeout for the API call
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+    const timeoutId = setTimeout(() => controller.abort(), 120000); // Increased timeout for GPT-4
 
     try {
       const evaluation = await getOpenAIEvaluation(
@@ -57,16 +57,34 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
       const supabase = createClient(supabaseUrl!, supabaseKey!);
 
+      // Extract required fields and handle any flexible format
+      const extractedEvaluation = {
+        grade: evaluation.grade || "",
+        reasoning: evaluation.reasoning || evaluation.begrundelse || evaluation.vurdering || 
+                  evaluation.explanation || evaluation.feedback || 
+                  (typeof evaluation.overall === 'string' ? evaluation.overall : ""),
+        improvements: Array.isArray(evaluation.improvements) ? evaluation.improvements :
+                     Array.isArray(evaluation.forbedringsforslag) ? evaluation.forbedringsforslag :
+                     Array.isArray(evaluation.forbedringer) ? evaluation.forbedringer : 
+                     Array.isArray(evaluation.weaknesses) ? evaluation.weaknesses : [],
+        strengths: Array.isArray(evaluation.strengths) ? evaluation.strengths : 
+                  Array.isArray(evaluation.styrker) ? evaluation.styrker : []
+      };
+
       // Store the evaluation in background
       EdgeRuntime.waitUntil((async () => {
         try {
           const sanitizedEvaluation: SanitizedEvaluation = {
             assignment_text: sanitizedAssignmentText,
             instructions_text: sanitizedInstructionsText,
-            grade: sanitizeText(evaluation.grade),
-            reasoning: sanitizeText(evaluation.reasoning),
-            improvements: evaluation.improvements.map(sanitizeText),
-            strengths: evaluation.strengths.map(sanitizeText)
+            grade: sanitizeText(extractedEvaluation.grade),
+            reasoning: sanitizeText(extractedEvaluation.reasoning),
+            improvements: extractedEvaluation.improvements.map(item => 
+              typeof item === 'string' ? sanitizeText(item) : sanitizeText(JSON.stringify(item))
+            ),
+            strengths: extractedEvaluation.strengths.map(item => 
+              typeof item === 'string' ? sanitizeText(item) : sanitizeText(JSON.stringify(item))
+            )
           };
 
           await supabase
@@ -78,7 +96,7 @@ serve(async (req) => {
       })());
 
       return new Response(
-        JSON.stringify(evaluation),
+        JSON.stringify(evaluation), // Return the original, complete evaluation
         { 
           headers: { 
             ...corsHeaders,
@@ -95,7 +113,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        message: 'Failed to evaluate assignment. This may be due to the complexity of the text or a timeout.'
+        message: 'Failed to evaluate assignment. Please try again with a shorter text or contact support.'
       }),
       { 
         status: 500,

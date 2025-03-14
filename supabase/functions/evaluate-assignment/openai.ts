@@ -25,7 +25,7 @@ export async function getOpenAIEvaluation(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-o1',
+      model: 'gpt-4',
       messages: [
         { 
           role: 'system', 
@@ -37,7 +37,7 @@ export async function getOpenAIEvaluation(
         }
       ],
       temperature: 0.7,
-      max_tokens: 1500,
+      max_tokens: 3000,
       response_format: { type: "json_object" },
     }),
   });

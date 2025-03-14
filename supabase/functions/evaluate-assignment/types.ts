@@ -1,14 +1,6 @@
-
 export interface EvaluationRequest {
   assignmentText: string;
   instructionsText?: string;
-}
-
-export interface EvaluationResult {
-  grade: string;
-  reasoning: string;
-  improvements: string[];
-  strengths: string[];
 }
 
 export interface SanitizedEvaluation {
@@ -18,4 +10,10 @@ export interface SanitizedEvaluation {
   reasoning: string;
   improvements: string[];
   strengths: string[];
+}
+
+// Basic required fields for backward compatibility
+export interface EvaluationResult {
+  grade: string;
+  [key: string]: any; // Allow any additional fields
 }

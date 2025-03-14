@@ -4,9 +4,10 @@ import { cleanContent } from './utils/text-cleaner';
 
 export interface EvaluationResult {
   grade: string;
-  reasoning: string;
-  improvements: string[];
-  strengths: string[];
+  reasoning?: string;
+  improvements?: string[] | any[];
+  strengths?: string[] | any[];
+  [key: string]: any; // Allow any additional fields
 }
 
 export const evaluateAssignment = async (

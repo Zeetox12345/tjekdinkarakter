@@ -243,6 +243,15 @@ const Index = () => {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 relative">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-8 border border-blue-100">
+          <h3 className="text-lg font-medium text-blue-800 mb-2">🆕 Forbedret evaluering med AI</h3>
+          <p className="text-blue-600">
+            Vores system benytter nu en avanceret AI-model, der kan strukturere din evaluering på den mest 
+            hjælpsomme måde. Du vil modtage en detaljeret, skræddersyet vurdering af dit arbejde med specifik 
+            feedback i forskellige kategorier.
+          </p>
+        </div>
+
         <section className="mb-6">
           <AccuracyStats />
         </section>

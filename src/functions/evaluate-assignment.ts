@@ -7,6 +7,7 @@ export interface EvaluationResult {
   reasoning?: string;
   improvements?: string[] | any[];
   strengths?: string[] | any[];
+  extractedSentences?: string[];
   [key: string]: any; // Allow any additional fields
 }
 
@@ -172,6 +173,40 @@ export const evaluateAssignment = async (
     assignmentContent = cleanContent(assignmentContent);
     instructionsContent = cleanContent(instructionsContent);
 
+    // Extract sentences from the assignment content for improvement suggestions
+    const extractSentences = (text: string): string[] => {
+      if (!text) return [];
+      
+      // Split content into sentences
+      const sentences = text
+        .replace(/([.!?])\s+/g, "$1|")
+        .split("|")
+        .filter(s => s.trim().length > 20 && s.trim().length < 200) // Only reasonably sized sentences
+        .map(s => s.trim());
+      
+      // Ensure we have unique sentences
+      const uniqueSentences = Array.from(new Set(sentences));
+      
+      // If we have fewer than 12 sentences, we'll use what we have
+      // If we have more than 12, select 12 sentences distributed throughout the text
+      if (uniqueSentences.length <= 12) {
+        return uniqueSentences;
+      } else {
+        const result = [];
+        const step = Math.floor(uniqueSentences.length / 12);
+        
+        for (let i = 0; i < 12; i++) {
+          const index = Math.min(i * step, uniqueSentences.length - 1);
+          result.push(uniqueSentences[index]);
+        }
+        
+        return result;
+      }
+    };
+
+    // Extract sentences from the assignment content
+    const extractedSentences = extractSentences(assignmentContent);
+
     const { data, error } = await supabase.functions.invoke('evaluate-assignment', {
       body: {
         assignmentText: assignmentContent,
@@ -187,6 +222,9 @@ export const evaluateAssignment = async (
     if (!data) {
       throw new Error('No evaluation data received');
     }
+
+    // Add extracted sentences to the evaluation result
+    data.extractedSentences = extractedSentences;
 
     // Only save evaluation to database for authenticated users
     if (user?.id) {
